@@ -1,0 +1,62 @@
+<template>
+  <header>
+    <div>
+    <img alt="Vue logo" src="../assets/logo_groupomania_white.svg">
+    </div>
+    <nav>
+      <ul>
+        <div class="nav__bar">
+          <li><router-link to="/">Home</router-link></li>
+          <li><router-link to="/forum">Forum</router-link></li>
+        </div>
+        <div class="connexion__bar">
+          <li><router-link to="/signup">Inscription</router-link></li>
+          <li><router-link to="/login">Connexion</router-link></li>
+        </div>
+      </ul>
+    </nav>
+
+  </header>
+</template>
+
+<script>
+export default {
+  name: 'HelloWorld',
+  props: {
+    msg: String
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+header {
+  background-color: #091f43;
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+}
+ul {
+  display: flex;
+  justify-content: space-between;
+  list-style-type: none;
+  padding: 0;
+    div {
+      display: flex;
+      padding-top: 1rem;
+    }
+}
+li {
+  margin: 0 2rem;
+}
+a {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  
+}
+a:hover {
+  color: lighten(#d1515a, 5%);
+}
+</style>

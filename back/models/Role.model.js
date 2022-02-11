@@ -9,6 +9,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(100),
             defaultValue: "",
             allowNull: false
+        },
+        multipass: {
+            type: Sequelize.STRING(64)
+
         }
     });
     return RoleSchema;

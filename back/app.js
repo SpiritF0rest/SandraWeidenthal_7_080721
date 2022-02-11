@@ -26,20 +26,25 @@ app.use((req, res, next) => {
 function initial() {
     Role.create({
         id: 1,
-        name: "user"
+        name: "user",
+        multipass: ""
     });
     Role.create({
         id: 2,
-        name: "moderator"
+        name: "moderator",
+        multipass: process.env.MULTIPASS_MODERATOR
     });
     Role.create({
         id: 3,
-        name: "admin"
+        name: "admin",
+        multipass: process.env.MULTIPASS_ADMIN
     });
 }
 
-db.sequelize.sync({ force: true }).then(() => {
-    console.log("Drop and Resync Db");
+db.sequelize
+    .sync() // { force: true } 
+    .then(() => {
+    console.log("Sync to db successful");
     initial();
 });
 
