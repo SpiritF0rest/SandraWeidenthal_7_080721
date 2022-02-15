@@ -11,8 +11,8 @@ verifyToken = (req, res, next) => {
     }
     try {
         const decodedToken = jwt.verify(token, config.secret);
-        req.authJwt = decodedToken.userId;
-
+        req.authJwt = decodedToken.id;
+        console.log("Token deco:" + req.authJwt);
         next();
     } catch (error) {
         res.status(401).json({ error: error | "Go back to the Shadow. You shall not pass!" });
@@ -20,7 +20,7 @@ verifyToken = (req, res, next) => {
 };
 
 isAdmin = (req, res, next) => {
-    User.findByPk(req.userId).then(user => {
+    User.findByPk(req.id).then(user => {
         user.getRoles().then(roles => {
             for (let i = 0; i < roles.length; i++) {
                 if (roles[i].name === "admin") {
@@ -35,7 +35,7 @@ isAdmin = (req, res, next) => {
 };
 
 isModerator = (req, res, next) => {
-    User.findByPk(req.userId).then(user => {
+    User.findByPk(req.id).then(user => {
         user.getRoles().then(roles => {
             for (let i = 0; i < roles.length; i++) {
                 if (roles[i].name === "moderator") {
@@ -49,7 +49,7 @@ isModerator = (req, res, next) => {
 };
 
 isModeratorOrAdmin = (req, res, next) => {
-    User.findByPk(req.userId).then(user => {
+    User.findByPk(req.id).then(user => {
         user.getRoles().then(roles => {
             for (let i= 0; i < roles.length; i++) {
                 if (roles[i].name === "moderator") {

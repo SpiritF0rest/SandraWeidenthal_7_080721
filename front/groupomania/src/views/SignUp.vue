@@ -15,21 +15,22 @@
         <div class="signUpForm__password">
           <label for="password">Mot de passe: </label>
           <input type="password" name="password" id="password" required minlength="8" v-model="formData.password" />
+          <p class="passwordErrorMsg"></p>
         </div>
-        <button type="button" @click="signUp(e)" :disabled="checkFormData()" id="signUp__submitButton">Envoyer</button>
+        <button type="button" @click="signUp()" :disabled="checkFormData()" id="signUp__submitButton">Envoyer</button>
       </form>
-        <div v-if="multipassClicked === 0" @click="addMultipassClicked()" class="multipass" >Fonction cachée pour admin/modo, clickez pour activer</div>
+        <div v-if="this.multipassClicked == 0" @click="addMultipassClicked()" class="multipass" >Fonction cachée pour admin/modo, clickez pour activer</div>
         <div v-else class= "multipassOK">
           <label for="passForMoreAccess">Multipass</label>
           <input 
             type="password" name="passForMoreAccess" id="passForMoreAccess"  
-            v-model="this.pass" @keyup.enter="checkMultipass()" />
+            v-model="this.pass" />
         </div>
   </div>
 </template>
 
 <script>
-//import axios from 'axios';
+import axios from 'axios';
 
 export default {
   name: 'SignUp',
@@ -38,19 +39,13 @@ export default {
   data() {
     return {
       pass: "",
-      //multipassWords: [],
+      multipassWords: [],
       multipassClicked: 0,
       formData: {
         pseudo: "",
         email: "",
         password: ""
       },
-    //  userData: {
-    //    pseudo: "",
-    //    email: "",
-    //    password: "",
-     //   roles: []
-    //  }
     };
   },
   methods: {
@@ -62,75 +57,35 @@ export default {
       }
     },  
     addMultipassClicked : function() {
-      if (this.multipassClicked === 0 ) {
-        this.multipassClicked += 1;
+      if (this.multipassClicked == 0 ) {
+        this.multipassClicked = 1;
       }
     }, 
-    //checkMultipass : function() {
-    //  let multipassWords = [""];
-    //  if (this.pass != "") {
-    //    multipassWords.push("");
-    //    multipassWords.push(this.pass);    
-    //  }
-    //  console.log(this.multipassWords);
-    //  return multipassWords;
-    //},
-    //@keyup.enter="checkMultipass()"
     createUserData : function() {
-      let multipassWords = [];
-      let userData = {};
-    //  let formDataBis = {};
-      console.log("pass:" + this.pass);
-      if (this.pass != "") {
-        multipassWords.push("");
-        multipassWords.push(this.pass);   
-      
-      if (this.checkFormData() && multipassWords.length >= 1) {
-        console.log("test1");
-          userData = {
-            pseudo: this.formData.pseudo,
-            email: this.formData.email,
-            //password: this.formData.password,
-            roles: multipassWords
+      this.multipassWords.push("");
+        if (this.pass != "" && !this.checkFormData()) { 
+          if (this.pass == process.env.VUE_APP_MULTIPASS_MODERATOR) {
+            this.multipassWords.push(this.pass);
           }
-          return userData;
-        }// else if(!this.checkFormData() && multipassWords.length == 0) {
-        //  console.log("test2");
-        //  formDataBis = {
-         //   pseudo: this.formData.pseudo,
-        //    email: this.formData.email,
-         //   password: this.formData.password
-        //  }
-         // return formDataBis;
-        //}
-        } else {
-          console.log("Fuck you!");
-        }
-      //} //else {
-        //const submitButton = document.getElementById("signUp__submitButton");
-       // const emptyFormAlert = document.createElement("p");
-       // emptyFormAlert.textContent = "Tous les champs doivent être correctement remplis.";
-       // submitButton.appendChild(emptyFormAlert);
-       // return emptyFormAlert;
-     // }
+          if (this.pass == process.env.VUE_APP_MULTIPASS_ADMIN) {
+            this.multipassWords.push(process.env.VUE_APP_MULTIPASS_MODERATOR);
+            this.multipassWords.push(this.pass);
+          }
+          this.formData.roles = this.multipassWords;
+        } else if (this.pass == "" && !this.checkFormData()) {
+          this.formData.roles = this.multipassWords;
+        } 
     },
-    signUp : function(e) {
-      e.preventDefault();
-      let formDataFunction = this.createUserData();
-
-      console.log("test function signup:" + formDataFunction);
-      //console.log(this.formData);
-      //console.log(this.userData);
-      if (formDataFunction) {
-      /*  axios
-        .post("http://localhost:3000/api/auth/signUp", formDataFunction)
-        .then(response => {
-          console.log(response);
-
-        })
-        .catch(error => console.log(error))*/
-        //this.$store.dispatch("createUser", this.formData);
-      }
+    signUp : function() {
+      this.createUserData();
+        axios
+          .post("http://localhost:3000/api/auth/signUp", this.formData)
+          .then(response => {
+            console.log(response);
+            this.multipassWords = [];
+            this.$router.push("/login")
+          })
+        .catch(error => console.log(error))
     }
   }
 

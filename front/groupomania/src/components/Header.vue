@@ -6,12 +6,14 @@
     <nav>
       <ul>
         <div class="nav__bar">
-          <li><router-link to="/">Home</router-link></li>
-          <li><router-link to="/forum">Forum</router-link></li>
+          <li v-if="this.login == true"><router-link to="/">Home</router-link></li>
+          <li v-if="this.login == true"><router-link to="/forum">Forum</router-link></li>
         </div>
         <div class="connexion__bar">
-          <li><router-link to="/signup">Inscription</router-link></li>
-          <li><router-link to="/login">Connexion</router-link></li>
+          <li v-if="this.login == false"><router-link to="/signup">Inscription</router-link></li>
+          <li v-if="this.login == false"><router-link to="/login">Connexion</router-link></li>
+          <li v-if="this.login == true"><router-link to="/profil">Profil</router-link></li>
+          <li v-if="this.login == true"><button type="button" class="powerBtn" @click="logout()"><fa icon="power-off" class="powerBtn__icon" /></button></li>
         </div>
       </ul>
     </nav>
@@ -20,10 +22,27 @@
 </template>
 
 <script>
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  name: 'Header',
+  data() {
+    return {
+      login: false,
+    }
+  },
+  mounted() {
+      if (localStorage.getItem("user")) {
+        console.log("login");
+        this.login = true;
+      } else {
+        this.login = false;
+      }
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem('user');
+      this.$router.push("/login");
+    }
   }
 }
 </script>
@@ -58,5 +77,14 @@ a {
 }
 a:hover {
   color: lighten(#d1515a, 5%);
+}
+.powerBtn {
+  border-style: none;
+  background-color: #091f43;
+  cursor: pointer;
+  &__icon {
+    color: white;
+    font-size: 1.5rem;
+  }
 }
 </style>

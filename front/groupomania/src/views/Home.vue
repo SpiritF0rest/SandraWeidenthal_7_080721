@@ -16,3 +16,8 @@ export default {
 }
 }
 </script>
+<style scoped lang="scss">
+  div {
+    background-color: white;
+  }
+</style>

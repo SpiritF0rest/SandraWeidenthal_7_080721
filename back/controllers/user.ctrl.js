@@ -42,6 +42,9 @@ exports.signup = (req, res, next) => {
                 pseudo: req.body.pseudo,
                 email: req.body.email,
                 password: hash, 
+                firstName: "",
+                lastName: "",
+                service: ""
             })
             .then(user => {
                 if (req.body.roles) {
@@ -91,8 +94,11 @@ exports.login = (req, res, next) => {
                         }
                         res.status(200).json({
                             id: user.id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
                             pseudo: user.pseudo,
                             email: user.email,
+                            service: user.service,
                             roles: authorities,
                             token: jwt.sign(
                                 { id: user.id },
@@ -122,6 +128,68 @@ exports.getOneUser = (req, res, next) => {
         .then(user => res.status(200).json(user))
         .catch(error => res.status(404).json({ error }));
 };
+
+exports.modifyUser = (req, res, next) => {
+    console.log(req.body);
+    User.findOne({ 
+        where: {
+            id: req.body.id
+        }
+    })
+        .then( user => {
+            if (user.id !== req.authJwt) {
+                return res.status(400).json({ error: "Unauthorized request" });
+            }
+            else if (user.id == req.authJwt) {
+                User.update( req.body, { where: { id:req.params.id }})
+                    .then(() => {
+                        User.findOne({ where: { id: req.body.id }})
+                        .then(user => {
+                            let authorities  = [];
+                            user.getRoles().then(roles => {
+                                for (let i = 0; i < roles.length; i++) {
+                                    authorities.push("ROLE_" + roles[i].name.toUpperCase());
+                                }
+                                let data = {
+                                    id: user.id,
+                                    firstName: user.firstName,
+                                    lastName: user.lastName,
+                                    pseudo: user.pseudo,
+                                    email: user.email,
+                                    service: user.service, 
+                                    roles: authorities,
+                                    token: jwt.sign(
+                                        { id: user.id },
+                                        config.secret,
+                                        { expiresIn: 86400 } //24 hours
+                                    )
+                                }
+                                res.status(200).json({ data }) 
+                            })
+                            .catch(error => res.status(400).json({ error }))
+                        })
+                        .catch(error => res.status(400).json({ error }))
+                    })
+                    .catch(error => res.status(400).json({ error }));
+            }
+        })
+        .catch(error => res.status(400).json({ error }));
+};
+
+/*
+exports.deleteUser = (req, res, next) => {
+    User.findOne({
+        where: {
+            id: req.body.id
+        }
+    })
+        //-il faut prendre en compte que:
+        //un user peut se delete
+        //un modo peut delete un user
+        //un admin peut delete un user et un modo
+        //-il est préférable d'utiliser un soft delete
+}
+*/
 
 // Test auth
 exports.allAccess = (req, res) => {
