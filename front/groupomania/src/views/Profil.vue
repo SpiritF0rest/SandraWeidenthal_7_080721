@@ -14,7 +14,7 @@
             </div>
             <div>
                 <button type="button" @click="editProfil()">Modifier</button>
-                <button type="button">Supprimer</button>    
+                <button type="button" @click="deleteUser()">Supprimer</button>    
             </div>
         </div>
         <div class="editProfil" v-else>
@@ -78,21 +78,27 @@ export default {
         };
     },
     beforeMount() {
-        if (localStorage.getItem("user")) {
-            try {
-                this.userData = JSON.parse(localStorage.getItem("user"));
-            } catch(e) {
-                //localStorage.removeItem("user");
-                console.log("Données corrompues");
-            }
-        }
+        this.createUserData();
     },
     mounted() {
         if (!localStorage.getItem("user")) {
             this.$router.push("/login");
         }
     },
+    updated() {
+        this.createUserData();
+    },
     methods : {
+        createUserData() {
+            if (localStorage.getItem("user")) {
+                try {
+                    this.userData = JSON.parse(localStorage.getItem("user"));
+                } catch(e) {
+                    //localStorage.removeItem("user");
+                    console.log("Données corrompues");
+                }
+            }
+        },
         checkFormData() {
             if (!this.formData.pseudo && !this.formData.email && !this.formData.lastName && !this.formData.firstName && !this.formData.service && !this.formData.newPassword) {
                 return false;
@@ -119,13 +125,23 @@ export default {
                 .put("http://localhost:3000/api/auth/" + this.formData.id, this.formData, { headers: {
                     authorization: `Bearer: ${this.userData.data.token}` }})
                 .then(response => {
-                    console.log("test");
                     response = response.data;
                     localStorage.setItem("user", JSON.stringify(response));
                     this.editClick = 0;
                 })
                 .catch(error => console.log(error))           
         },
+        deleteUser() {
+            axios
+                .delete("http://localhost:3000/api/auth/" + this.userData.data.id, { headers: {
+                    authorization: `Bearer: ${this.userData.data.token}` }})
+                .then(response => {
+                    console.log(response);
+                    localStorage.removeItem('user');
+                    this.$router.push("/signup");
+                })
+                .catch(error => console.log(error))
+        }
     }
 }
 </script>

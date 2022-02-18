@@ -3,6 +3,8 @@ import Home from '../views/Home.vue';
 import Forum from '../views/Forum.vue';
 import SignUp from '../views/SignUp.vue';
 import Login from '../views/Login.vue';
+import AdminBoard from '../views/AdminBoard.vue';
+import ModeratorBoard from '../views/ModeratorBoard.vue';
 import Profil from '../views/Profil.vue';
 
 const routes = [
@@ -31,6 +33,16 @@ const routes = [
     name: 'Profil',
     component: Profil
   },
+  {
+    path: '/admin-board',
+    name: 'AdminBoard',
+    component: AdminBoard
+  },
+  {
+    path: '/moderator-board',
+    name: 'ModeratorBoard',
+    component: ModeratorBoard
+  }
 ]
 
 const router = createRouter({

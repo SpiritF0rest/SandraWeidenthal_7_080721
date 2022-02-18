@@ -24,22 +24,22 @@ app.use((req, res, next) => {
 });
 
 function initial() {
-    Role.create({
+    Role.findOrCreate({where: {
         id: 1,
         name: "user",
         multipass: ""
-    });
-    Role.create({
+    }});
+    Role.findOrCreate({where: {
         id: 2,
         name: "moderator",
         multipass: process.env.MULTIPASS_MODERATOR
-    });
-    Role.create({
+    }});
+    Role.findOrCreate({where: {
         id: 3,
         name: "admin",
         multipass: process.env.MULTIPASS_ADMIN
-    });
-}
+    }});
+};
 
 db.sequelize
     .sync() // { force: true } 

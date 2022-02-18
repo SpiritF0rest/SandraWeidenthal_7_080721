@@ -8,6 +8,8 @@
         <div class="nav__bar">
           <li v-if="this.login == true"><router-link to="/">Home</router-link></li>
           <li v-if="this.login == true"><router-link to="/forum">Forum</router-link></li>
+          <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board">ModoBoard</router-link></li>
+          <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board">AdminBoard</router-link></li>
         </div>
         <div class="connexion__bar">
           <li v-if="this.login == false"><router-link to="/signup">Inscription</router-link></li>
@@ -31,14 +33,27 @@ export default {
     }
   },
   mounted() {
+    this.checkLogin(); 
+  },
+  methods: {
+    checkLogin() {
       if (localStorage.getItem("user")) {
         console.log("login");
         this.login = true;
       } else {
         this.login = false;
       }
-  },
-  methods: {
+    },
+    checkRole() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      let moderator = user.data.roles[1];
+      let admin = user.data.roles[2]
+      if (admin == process.env.VUE_APP_ADMIN_KEY) {//
+        return 2;
+      } else if (moderator == process.env.VUE_APP_MODO_KEY) {
+        return 1;
+      }
+    },
     logout() {
       localStorage.removeItem('user');
       this.$router.push("/login");

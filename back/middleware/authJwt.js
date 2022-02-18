@@ -12,7 +12,7 @@ verifyToken = (req, res, next) => {
     try {
         const decodedToken = jwt.verify(token, config.secret);
         req.authJwt = decodedToken.id;
-        console.log("Token deco:" + req.authJwt);
+        req.authRole  = decodedToken.role;
         next();
     } catch (error) {
         res.status(401).json({ error: error | "Go back to the Shadow. You shall not pass!" });

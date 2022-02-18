@@ -101,7 +101,9 @@ exports.login = (req, res, next) => {
                             service: user.service,
                             roles: authorities,
                             token: jwt.sign(
-                                { id: user.id },
+                                { id: user.id,
+                                 role: authorities[authorities.length -1]
+                                },
                                 config.secret,
                                 { expiresIn: 86400 } //24 hours
                             )
@@ -114,13 +116,15 @@ exports.login = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-    User.find()
-        .then(users => res.status(200).json(users))
-        .catch(error => res.status(400).json({ error }));
+    if(req.authRole == "ROLE_MODERATOR" || req.authRole == "ROLE_ADMIN"){
+        User.findAll({include: Role})
+            .then(users => res.status(200).json(users))
+            .catch(error => res.status(400).json({ error }));
+    }
 };
 
 exports.getOneUser = (req, res, next) => {
-    User.findOne({ 
+    User.findByPk({ 
         where: {
             id: req.params.id
         }
@@ -176,20 +180,25 @@ exports.modifyUser = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-/*
 exports.deleteUser = (req, res, next) => {
-    User.findOne({
-        where: {
-            id: req.body.id
-        }
+    User.findByPk(req.authJwt)
+    .then(user => {
+        if (user.id == req.authJwt || req.authRole == "ROLE_MODERATOR" || req.authRole == "ROLE_ADMIN") {
+            User.destroy({ where: { id:req.params.id }})
+                .then(() => res.status(200).json({ message: "User deleted." }))
+                .catch(error => res.status(400).json({ error }));
+        } else { 
+            return res.status(400).json({ error: "Unauthorized request" });
+        };
     })
-        //-il faut prendre en compte que:
-        //un user peut se delete
-        //un modo peut delete un user
-        //un admin peut delete un user et un modo
-        //-il est préférable d'utiliser un soft delete
-}
-*/
+    .catch(error => res.status(400).json({ error }));
+};
+
+//exports.getAllPseudo = (req, res, next) => {
+//  User.findAll({ attributes : ["pseudo"] })
+//      .then(users => res.status(200).json(users))
+//      .catch(error => res.status(400).json({ error }));
+//}
 
 // Test auth
 exports.allAccess = (req, res) => {
