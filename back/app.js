@@ -5,7 +5,11 @@ const app           = express();
 const db            = require("./models");
 const Role          = db.role;
 
+const path          = require("path");
+
 const userRoutes    = require("./routes/user.route");
+const postRoutes    = require("./routes/post.route");
+const commentRoutes = require("./routes/comment.route");
 
 const helmet        = require("helmet");
 const rateLimit     = require("express-rate-limit");
@@ -63,7 +67,12 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }))
 // Apply the rate limiting middleware to all requests.
 app.use(limiter);
 
+// Method to manage the image ressource statiscally.
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 // Add the router to the middleware management path, specifying a path.
 app.use("/api/auth", userRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
 
 module.exports = app;

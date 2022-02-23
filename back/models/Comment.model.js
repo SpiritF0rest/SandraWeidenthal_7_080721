@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const PostSchema = sequelize.define("Post", {
+    const CommentSchema = sequelize.define("Comment", {
         id: {
             type: Sequelize.INTEGER(11), 
             primaryKey: true, 
@@ -16,11 +16,13 @@ module.exports = (sequelize, Sequelize) => {
         },
         author: {
             type: Sequelize.STRING(100),
-            allowNull: false
+            allowNull: false,
+            unique: true
         }, 
         authorId: {
             type: Sequelize.INTEGER(11),
-            allowNull: false
+            allowNull: false, 
+            unique: true
         }
         /*likes: {
             type: Sequelize.INTEGER
@@ -35,5 +37,5 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.JSON
         }*/
     });
-    return PostSchema;
+    return CommentSchema;
 }
