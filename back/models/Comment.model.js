@@ -16,13 +16,11 @@ module.exports = (sequelize, Sequelize) => {
         },
         author: {
             type: Sequelize.STRING(100),
-            allowNull: false,
-            unique: true
+            allowNull: false
         }, 
         authorId: {
             type: Sequelize.INTEGER(11),
-            allowNull: false, 
-            unique: true
+            allowNull: false
         }
         /*likes: {
             type: Sequelize.INTEGER

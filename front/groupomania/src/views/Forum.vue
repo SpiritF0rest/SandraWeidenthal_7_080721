@@ -14,15 +14,19 @@
     <div>
       <article v-for="post in allPosts.slice().reverse()" :key="post" class="post">
         <h2>{{ post.author }}</h2>
-        <p>{{ post.createdAt }}</p>
+        <!--<p>le {{ post.createdAt.slice(8,10) }}/{{ post.createdAt.slice(5,7) }}/{{ post.createdAt.slice(0,4) }} à {{ post.createdAt.slice(11,16) }}.</p>
+        <p>le {{ post.createdAt.split(/[-T]/).slice(0,-1).reverse().join("/")}}, à {{ post.createdAt.split(/[T:\.]/).slice(1,-2).join(":") }}.</p>
+        <p>le {{ post.createdAt.split(/[\.:]/).slice(0,-2).join(":").split(/[T-]/).reverse().join("/").split("").fill(" à ",5,6).join("").split("à").reverse().join(", à ") }}</p>-->
+        <p>le {{ post.createdAt.split("T")[0].split("-").reverse().join("/") + ", à " + post.createdAt.split("T")[1].split(":").slice(0,-1).join(":") }} </p>
         <p>{{ post.text }}</p>
         <div v-if="post.imageUrl"> 
           <img class="post__image" :src="`${post.imageUrl}`" />   
         </div>
         <button type="button" v-if="checkUser(post.authorId)" @click="editPost(post.id)">Modifier</button> 
         <button type="button" v-if="checkUserAndModerator(post.authorId)" @click="deletePost(post.id)">Supprimer</button> 
-        <div v-for="comment in post.comments" :key="comment" class="comment"> 
-          <button v-if="post.comments.length > 3" type="button" @click="seeMoreComments()">Voir plus de commentaires</button> 
+        <button v-if="post.Comments.length > 3" type="button" @click="showMoreComments(post.Comments.length)">Voir plus de commentaires</button>
+        <button v-if="commentsLimit == post.Comments.length" type="button" @click="showLessComments()">Réduire les commentaires</button> 
+        <div v-for="comment in post.Comments.slice(0, commentsLimit)" :key="comment" class="comment"> 
           <h3>{{ comment.author }}</h3> 
           <p>{{ comment.createdAt }}</p>
           <p>{{ comment.text }}</p>
@@ -38,7 +42,7 @@
             <textarea id="comment" name="comment" v-model="commentData.text"></textarea>
             <label for="commentImage">Image</label>
             <input type="file" id="commentImage" name="commentImage" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
-            <button type="button" @click="createComment()">Publier</button>
+            <button type="button" @click="createComment(post.id)">Publier</button>
           </form>
         </div>
       </article>
@@ -59,7 +63,7 @@
           <label for="imageCommentEdit">Image</label>
           <input type="file" id="imageCommentEdit" name="imageCommentEdit" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
           <button type="button" @click="goBackToForum()">Retour</button>
-          <button type="button" @click="commentPostData(commentId)" :disabled="!checkCommentFormData()">Modifier</button>
+          <button type="button" @click="editCommentData(commentId)" :disabled="!checkCommentFormData()">Modifier</button>
         </form>
       </div>
     </div>
@@ -87,7 +91,8 @@ export default {
         editedCommentData: {},
         postId: null,
         commentId: null,
-        control: 0
+        control: 0,
+        commentsLimit: 3
       }
     },
     beforeMount() {
@@ -120,12 +125,6 @@ export default {
           return false;
         }
       },
-      uploadImage(e) {
-        this.control = 1;
-        const file = e.target.files[0];
-        console.log(file);
-        this.postImage = file;            //renommer par un terme plus général
-      },
       checkFormData() {
         if(!this.editedPostData.text && !this.postImage){
           return false;
@@ -134,11 +133,17 @@ export default {
         }
       },
       checkCommentFormData() {
-        if(!this.editedPostData.text && !this.postImage){
+        if(!this.editedCommentData.text && !this.postImage){
           return false;
         } else {
           return true;
         }
+      },
+      uploadImage(e) {
+        this.control = 1;
+        const file = e.target.files[0];
+        console.log(file);
+        this.postImage = file;            //renommer par un terme plus général
       },
       createPost() {
         this.postData.author = this.userData.data.pseudo;
@@ -161,16 +166,17 @@ export default {
           })
           .catch(error => console.log(error));
       },
-      createComment() {
+      createComment(postId) {
         this.commentData.author = this.userData.data.pseudo;
         this.commentData.authorId = this.userData.data.id;
         let formData = new FormData();
         if (this.control == 1) {
-          formData.append('file', this.commentImage, this.commentImage.name);
+          formData.append('file', this.postImage, this.postImage.name);
         }
         formData.append('author', this.commentData.author);
         formData.append('authorId', this.commentData.authorId);
         formData.append('text', this.commentData.text);
+        formData.append('PostId', postId);
         axios
           .post("http://localhost:3000/api/comments/", formData)
           .then(response => {
@@ -198,13 +204,16 @@ export default {
         if (this.editClick == 1) {
           this.editClick = 0;
         }
+        if (this.commentClick == 1) {
+          this.commentClick = 0;
+        }
       },
       editPostData(postId) {
         let formData = new FormData();
         if(this.editedPostData.text) {
           formData.append('text', this.editedPostData.text);
         }
-        if(this.postImage) {
+        if(this.postImage && this.control == 1) {
           formData.append('file', this.postImage, this.postImage.name);
         }
         axios
@@ -213,6 +222,7 @@ export default {
             .then(response => {
                 console.log(response);
                 this.editClick = 0;
+                this.control = 0;
                 this.getAllPosts();
             })
             .catch(error => console.log(error))           
@@ -222,7 +232,7 @@ export default {
         if(this.editedCommentData.text) {
           formData.append('text', this.editedCommentData.text);
         }
-        if(this.postImage) {
+        if(this.postImage && this.control == 1) {
           formData.append('file', this.postImage, this.postImage.name);
         }
         axios
@@ -231,6 +241,7 @@ export default {
             .then(response => {
                 console.log(response);
                 this.commentClick = 0;
+                this.control = 0;
                 this.getAllPosts();
             })
             .catch(error => console.log(error))           
@@ -254,9 +265,25 @@ export default {
               authorization: `Bearer: ${this.userData.data.token}` }})
           .then(response => {
               console.log(response);
+              location.reload();
+          })
+          .catch(error => console.log(error))
+      },
+      deleteComment(commentId) {
+        axios
+          .delete("http://localhost:3000/api/comments/" + commentId, { headers: {
+              authorization: `Bearer: ${this.userData.data.token}` }})
+          .then(response => {
+              console.log(response);
               this.getAllPosts();
           })
           .catch(error => console.log(error))
+      },
+      showMoreComments(allComments) {
+        this.commentsLimit = allComments;
+      },
+      showLessComments() {
+        this.commentsLimit = 3;
       }
     }
   

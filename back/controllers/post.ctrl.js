@@ -37,7 +37,8 @@ exports.modifyPost = (req, res, next) => {
                 res.status(400).json({ error: "Unauthorized request." })
             }
             else if (post.authorId == req.authJwt) {
-                if (req.file.filename) {
+                let imagePath = post.imageUrl;
+                if (req.file) {
                     const filename = post.imageUrl.split("/images/")[1];
                     fs.unlink(`images/${filename}`, (err) => {
                         if (err) { 
@@ -46,8 +47,8 @@ exports.modifyPost = (req, res, next) => {
                             console.log('This image is deleted');
                         }
                     });
+                    imagePath = "http://localhost:3000/images/" + req.file.filename; 
                 };
-                let imagePath = "http://localhost:3000/images/" + req.file.filename; 
                 Post.update({ text: req.body.text, imageUrl: imagePath }, { where: { id:req.params.id }})
                     .then(() => res.status(200).json({ message: "Post modified." }))
                     .catch(error => res.status(400).json({ error }));
@@ -59,10 +60,7 @@ exports.modifyPost = (req, res, next) => {
 exports.deletePost = (req, res, next) => {
     Post.findOne({ where : { id: req.params.id } })
         .then(post => {
-            if (post.authorId !== req.authJwt) {
-                res.status(400).json({ error: "Unauthorized request." })
-            }
-            else if (post.authorId == req.authJwt) {
+            if (post.authorId == req.authJwt || req.authRole == "ROLE_MODERATOR" || req.authRole == "ROLE_ADMIN") {
                 if (req.body.imageUrl) {
                     const filename = post.imageUrl.split("/images/")[1];
                     fs.unlink(`images/${filename}`, (err) => {
@@ -70,13 +68,15 @@ exports.deletePost = (req, res, next) => {
                             console.log(err);
                         } else {
                             console.log('This image is deleted');
-                        }
+                        };
                     });
                 };
                 Post.destroy({ where: { id: req.params.id }})
                     .then(() => res.status(200).json({ message: "Post deleted." }))
                     .catch(error => res.status(400).json({ error }));
-            }
+            } else {
+                res.status(400).json({ error: "Unauthorized request." }) 
+            };
         })
         .catch(error => res.status(500).json({ error }));
 };
