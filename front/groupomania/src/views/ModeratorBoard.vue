@@ -30,6 +30,11 @@ export default {
         };
     },
     beforeMount() {
+        if (!localStorage.getItem("user") || JSON.parse(localStorage.getItem("user")).data.roles[1] != process.env.VUE_APP_MODO_KEY) {
+        this.$router.push("/login");
+    }
+    },
+    mounted() {
         this.getAllUsers();
     },
     computed : {

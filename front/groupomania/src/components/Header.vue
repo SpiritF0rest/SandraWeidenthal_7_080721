@@ -1,20 +1,20 @@
 <template>
   <header>
-    <div>
+    <div class="logo">
     <img alt="Vue logo" src="../assets/logo_groupomania_white.svg">
     </div>
     <nav>
       <ul>
         <div class="nav__bar">
-          <li v-if="this.login == true"><router-link to="/">Home</router-link></li>
-          <li v-if="this.login == true"><router-link to="/forum">Forum</router-link></li>
+          <li v-if="this.login == true"><router-link to="/"><fa icon="house" /> Home</router-link></li>
+          <li v-if="this.login == true"><router-link to="/forum"><fa icon="icons" /> Forum</router-link></li>
           <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board">ModoBoard</router-link></li>
           <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board">AdminBoard</router-link></li>
         </div>
         <div class="connexion__bar">
           <li v-if="this.login == false"><router-link to="/signup">Inscription</router-link></li>
           <li v-if="this.login == false"><router-link to="/login">Connexion</router-link></li>
-          <li v-if="this.login == true"><router-link to="/profil">Profil</router-link></li>
+          <li v-if="this.login == true"><router-link to="/profil"><fa icon="user" /> Profil</router-link></li>
           <li v-if="this.login == true"><button type="button" class="powerBtn" @click="logout()"><fa icon="power-off" class="powerBtn__icon" /></button></li>
         </div>
       </ul>
@@ -68,7 +68,7 @@ header {
   background-color: #091f43;
   display: flex;
   justify-content: space-between;
-  padding: 2rem;
+  padding: 1rem;
 }
 ul {
   display: flex;
@@ -77,7 +77,6 @@ ul {
   padding: 0;
     div {
       display: flex;
-      padding-top: 1rem;
     }
 }
 li {
@@ -85,13 +84,13 @@ li {
 }
 a {
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   text-decoration: none;
   
 }
 a:hover {
-  color: lighten(#d1515a, 5%);
+  color: #d2d2d2;
 }
 .powerBtn {
   border-style: none;
@@ -99,7 +98,17 @@ a:hover {
   cursor: pointer;
   &__icon {
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    &:hover {
+      color: #d2d2d2;
+    }
   }
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+img {
+  height: 2.5rem;
 }
 </style>

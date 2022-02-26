@@ -151,57 +151,96 @@ exports.modifyUser = (req, res, next) => {
       if (user.id !== req.authJwt) {
         return res.status(400).json({ error: "Unauthorized request" });
       } else {
-        bcrypt
-          .compare(req.body.oldPassword, user.password)
-          .then((valid) => {
-            if (!valid) {
-              return res.status(401).json({ error: "Incorrect password." });
-            }
-            bcrypt
-              .hash(req.body.password, parseInt(process.env.BCRYPT_SALT_ROUND))
-              .then((hash) => {
-                User.update(
-                  { ...req.body, password: hash },
-                  { where: { id: req.params.id } }
-                )
-                  .then(() => {
-                    User.findOne({ where: { id: req.body.id } })
-                      .then((user) => {
-                        let authorities = [];
-                        user
-                          .getRoles()
-                          .then((roles) => {
-                            for (let i = 0; i < roles.length; i++) {
-                              authorities.push(
-                                "ROLE_" + roles[i].name.toUpperCase()
-                              );
-                            }
-                            let data = {
-                              id: user.id,
-                              firstName: user.firstName,
-                              lastName: user.lastName,
-                              pseudo: user.pseudo,
-                              email: user.email,
-                              service: user.service,
-                              roles: authorities,
-                              //password: hash,
-                              token: jwt.sign(
-                                { id: user.id },
-                                config.secret,
-                                { expiresIn: 86400 } //24 hours
-                              ),
-                            };
-                            res.status(200).json({ data });
-                          })
-                          .catch((error) => res.status(400).json({ error }));
-                      })
-                      .catch((error) => res.status(400).json({ error }));
-                  })
-                  .catch((error) => res.status(400).json({ error }));
-              })
-              .catch((error) => res.status(400).json({ error }));
-          })
-          .catch((error) => res.status(400).json({ error }));
+        if ( req.body.oldPassword) {
+          bcrypt
+            .compare(req.body.oldPassword, user.password)
+            .then((valid) => {
+              if (!valid) {
+                return res.status(401).json({ error: "Incorrect password." });
+              }
+              bcrypt
+                .hash(req.body.password, parseInt(process.env.BCRYPT_SALT_ROUND))
+                .then((hash) => {
+                  User.update(
+                    { ...req.body, password: hash },
+                    { where: { id: req.params.id } }
+                  )
+                    .then(() => {
+                      User.findOne({ where: { id: req.body.id } })
+                        .then((user) => {
+                          let authorities = [];
+                          user
+                            .getRoles()
+                            .then((roles) => {
+                              for (let i = 0; i < roles.length; i++) {
+                                authorities.push(
+                                  "ROLE_" + roles[i].name.toUpperCase()
+                                );
+                              }
+                              let data = {
+                                id: user.id,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                pseudo: user.pseudo,
+                                email: user.email,
+                                service: user.service,
+                                roles: authorities,
+                                token: jwt.sign(
+                                  { id: user.id },
+                                  config.secret,
+                                  { expiresIn: 86400 } //24 hours
+                                ),
+                              };
+                              res.status(200).json({ data });
+                            })
+                            .catch((error) => res.status(400).json({ error }));
+                        })
+                        .catch((error) => res.status(400).json({ error }));
+                    })
+                    .catch((error) => res.status(400).json({ error }));
+                })
+                .catch((error) => res.status(400).json({ error }));
+            })
+            .catch((error) => res.status(400).json({ error }));
+        } else {
+          User.update(
+            { ...req.body },
+            { where: { id: req.params.id } }
+          )
+            .then(() => {
+              User.findOne({ where: { id: req.body.id } })
+                .then((user) => {
+                  let authorities = [];
+                  user
+                    .getRoles()
+                    .then((roles) => {
+                      for (let i = 0; i < roles.length; i++) {
+                        authorities.push(
+                          "ROLE_" + roles[i].name.toUpperCase()
+                        );
+                      }
+                      let data = {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        pseudo: user.pseudo,
+                        email: user.email,
+                        service: user.service,
+                        roles: authorities,
+                        token: jwt.sign(
+                          { id: user.id },
+                          config.secret,
+                          { expiresIn: 86400 } //24 hours
+                        ),
+                      };
+                      res.status(200).json({ data });
+                    })
+                    .catch((error) => res.status(400).json({ error }));
+                })
+                .catch((error) => res.status(400).json({ error }));
+            })
+            .catch((error) => res.status(400).json({ error }));
+        }
       }
     })
     .catch((error) => res.status(400).json({ error }));
