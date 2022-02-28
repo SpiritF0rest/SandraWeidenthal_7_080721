@@ -21,6 +21,8 @@ export default {
     text-align: center;
     color: #2c3e50;
     background-color: #091f43;
+    max-width: 1400px;
+    margin: 0 auto;
   }
 }
 body{
@@ -45,7 +47,7 @@ body{
     font-weight: bold;
     border: none;
     border-radius: 1.5rem 1.5rem;
-    background: linear-gradient(160deg,#d1515a ,#4e1e22 );
+    background-color: #d1515a;
     box-shadow: 1px 1px 3px #341416;
     text-shadow: 2px 1px 3px #4e1e22;
     color: white;

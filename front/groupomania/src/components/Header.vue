@@ -65,10 +65,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 header {
-  background-color: #091f43;
+  background-color: #515ad1;
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 3rem;
 }
 ul {
   display: flex;
@@ -94,7 +94,7 @@ a:hover {
 }
 .powerBtn {
   border-style: none;
-  background-color: #091f43;
+  background-color: #515ad1;
   cursor: pointer;
   &__icon {
     color: white;

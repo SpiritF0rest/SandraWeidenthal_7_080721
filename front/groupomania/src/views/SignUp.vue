@@ -26,13 +26,11 @@
         <p id="loginError"></p>
       </form>
       <p>Déjà un compte, connectez-vous : <span @click="goLogin()">Connexion</span></p>
-        <!--<div v-if="this.multipassClicked == 0" @click="addMultipassClicked()" class="multipass" >Fonction cachée pour admin/modo, clickez pour activer</div>
+        <div v-if="this.multipassClicked == 0" @click="addMultipassClicked()" class="multipass" >Fonction cachée pour admin/modo, clickez pour activer</div>
         <div v-else class= "multipassOK">
           <label for="passForMoreAccess">Multipass</label>
-          <input 
-            type="password" name="passForMoreAccess" id="passForMoreAccess"  
-            v-model="this.pass" />
-        </div>-->
+          <input type="password" name="passForMoreAccess" id="passForMoreAccess" v-model="pass" />
+        </div>
   </div>
 </template>
 
@@ -49,11 +47,7 @@ export default {
       pass: "",
       multipassWords: [],
       multipassClicked: 0,
-      formData: {
-        pseudo: "",
-        email: "",
-        password: ""
-      },
+      formData: {},
       badInput: [],
       pseudoRegex: pseudoRegex,
       emailRegex: emailRegex,
@@ -111,7 +105,7 @@ export default {
     }, 
     createUserData : function() {
       this.multipassWords.push("");
-        if (this.pass != "" && !this.checkFormData()) { 
+        if (this.pass != "" && this.checkFormData()) { 
           if (this.pass == process.env.VUE_APP_MULTIPASS_MODERATOR) {
             this.multipassWords.push(this.pass);
           }
@@ -120,7 +114,7 @@ export default {
             this.multipassWords.push(this.pass);
           }
           this.formData.roles = this.multipassWords;
-        } else if (this.pass == "" && !this.checkFormData()) {
+        } else if (this.pass == "" && this.checkFormData()) {
           this.formData.roles = this.multipassWords;
         } 
     },
@@ -151,9 +145,6 @@ export default {
   .multipass {
     color: white;
   }
-  /*.signInUp__container {
-    position: relative
-  }*/
   span {
     cursor: pointer;
     font-weight: bold;

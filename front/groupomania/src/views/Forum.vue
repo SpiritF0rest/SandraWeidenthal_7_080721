@@ -8,74 +8,108 @@
           <div class="profilImage"><p class="profilImage__p" v-if="getLetter()">{{ pseudoLetter }}</p></div>
           <label for="post" aria-label="Texte du post"></label>
           <textarea id="post" name="text" v-model="postData.text" :placeholder="'Quoi de neuf, ' + `${userData.data.pseudo}` +' ?'"></textarea>
+          <div class="createPost__image"> 
+            <label for="getPostFile" class="forumButton" aria-label="ajouter une image" title="Ajouter une image." ><fa icon="images" /></label>
+            <input type="file" id="getPostFile" name="image" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
+          </div>
         </div>
-        <label for="image"><fa icon="images" /> Image</label>
-        <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
-        <button type="button" @click="createPost()" :disabled="!checkFormData(postData.text)" >Publier</button>
+        <div class="createPost__button">
+          <button type="button" class="forumButton" @click="createPost()" :disabled="!checkFormData(postData.text)" >Publier</button>
+        </div>
       </form>
     </div>
     <div>
       <article v-for="post in allPosts.slice().reverse()" :key="post" class="post">
         <div class="post__header"> 
-          <div class="profilImage"><p class="profilImage__p" v-if="getLetter()">{{ pseudoLetter }}</p></div>
+          <div class="profilImage"><p class="profilImage__p" v-if="getLetterPost(post.author)">{{ authorLetter }}</p></div>
           <div class="post__author"> 
             <h2>{{ post.author }}</h2>
-            <!--<p>le {{ post.createdAt.slice(8,10) }}/{{ post.createdAt.slice(5,7) }}/{{ post.createdAt.slice(0,4) }} à {{ post.createdAt.slice(11,16) }}.</p>
-            <p>le {{ post.createdAt.split(/[-T]/).slice(0,-1).reverse().join("/")}}, à {{ post.createdAt.split(/[T:\.]/).slice(1,-2).join(":") }}.</p>
-            <p>le {{ post.createdAt.split(/[\.:]/).slice(0,-2).join(":").split(/[T-]/).reverse().join("/").split("").fill(" à ",5,6).join("").split("à").reverse().join(", à ") }}</p>-->
             <p class="post__date">le {{ post.createdAt.split("T")[0].split("-").reverse().join("/") + ", à " + post.createdAt.split("T")[1].split(":").slice(0,-1).join(":") }} </p>
           </div>
         </div>
-        <p>{{ post.text }}</p>
-        <div v-if="post.imageUrl"> 
-          <img class="post__image" :src="`${post.imageUrl}`" />   
+        <div class="post__content"> 
+          <p v-if="post.text && post.text != 'undefined'" class="post__text">{{ post.text }}</p>
+          <div v-if="post.imageUrl"> 
+            <img class="post__image" :src="`${post.imageUrl}`" />   
+          </div>
         </div>
         <div class="post__buttons"> 
-          <button type="button" v-if="checkUser(post.authorId)" @click="editPost(post.id)"><fa icon="pencil" /> Modifier</button> 
-          <button type="button" v-if="checkUserAndModerator(post.authorId)" @click="deletePost(post.id)"><fa icon="trash-can" /> Supprimer</button> 
+          <button type="button" class="forumButton" v-if="checkUser(post.authorId)" @click="editPost(post.id)"><fa icon="pencil" /> Modifier</button> 
+          <button type="button" class="forumButton forumButton--red" v-if="checkUserAndModerator(post.authorId)" @click="deletePost(post.id)"><fa icon="trash-can" /> Supprimer</button> 
         </div>
-        <button v-if="post.Comments.length > 3" type="button" @click="showMoreComments(post.Comments.length)">Voir plus de commentaires</button>
-        <button v-if="commentsLimit == post.Comments.length" type="button" @click="showLessComments()">Réduire les commentaires</button> 
-        <div v-for="comment in post.Comments.slice(0, commentsLimit).reverse()" :key="comment" class="comment"> 
-          <h3>{{ comment.author }}</h3> 
-          <p>{{ comment.createdAt }}</p>
-          <p>{{ comment.text }}</p>
-          <div v-if="comment.imageUrl"> 
-            <img class="comment__image" :src="`${comment.imageUrl}`" />
+        <div v-if="editClick == 1 && post.id == postId" class="postEdit">
+          <form class="postEdit__form">
+            <div class="postEdit__header"> 
+              <label for="postEdit" aria-label="Texte de post à modifier"></label>
+              <textarea id="postEdit" name="text" :placeholder="'Modifiez votre post...'" v-model="editedPostData.text"></textarea>
+              <div class="postEdit__image"> 
+                <label for="imageEdit" class="forumButton" aria-label="ajouter une image" title="Ajouter une image"><fa icon="images" /></label>
+                <input type="file" id="imageEdit" name="imageEdit" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
+              </div>
+            </div>
+            <div class="postEdit__buttons"> 
+              <button type="button" class="forumButton forumButton--red" @click="goBackToForum()"><fa icon="reply" /></button>
+              <button type="button" class="forumButton" @click="editPostData(postId)" :disabled="!checkFormData(editedPostData.text)">Modifier</button>
+            </div>
+          </form>
+        </div>
+        <button v-if="post.Comments.length > commentsLimit" class="showButton showButton__more" type="button" @click="showMoreComments(post.Comments.length)"><fa icon="chevron-down" /></button>
+        <button v-if="post.Comments.length > 3 && showComments == 1" class="showButton showButton__less" type="button" @click="showLessComments()"><fa icon="chevron-up" /></button> 
+        <div v-for="(comment) in post.Comments.slice(0, commentsLimit).reverse()" :key="comment" class="comment"> 
+          <div class="profilImage"><p class="profilImage__p" v-if="getLetterPost(comment.author)">{{ authorLetter }}</p></div>
+          <div class="comment__block"> 
+            <div class="comment__blockUp"> 
+              <div class="comment__header">  
+                  <h3 class="comment__author">{{ comment.author }}</h3> 
+                  <p class="comment__date">le {{ comment.createdAt.split("T")[0].split("-").reverse().join("/") + ", à " + comment.createdAt.split("T")[1].split(":").slice(0,-1).join(":") }}</p>
+              </div> 
+              <div class="comment__content"> 
+                <p class="comment__text" v-if="comment.text && comment.text != 'undefined'" >{{ comment.text }}</p>
+                <div v-if="comment.imageUrl"> 
+                  <img class="comment__image" :src="`${comment.imageUrl}`" />
+                </div>
+              </div>
+            </div>
+            <div class="comment__buttons"> 
+              <button type="button" class="forumButton" v-if="checkUser(comment.authorId)" @click="editComment(comment.id)"><fa icon="pencil" /></button> 
+              <button type="button" class="forumButton forumButton--red" v-if="checkUserAndModerator(comment.authorId)" @click="deleteComment(comment.id)"><fa icon="trash-can" /></button>
+            </div>    
           </div>
-          <button type="button" v-if="checkUser(comment.authorId)" @click="editComment(comment.id)">Modifier</button> 
-          <button type="button" v-if="checkUserAndModerator(comment.authorId)" @click="deleteComment(comment.id)">Supprimer</button>
+          <div v-if="commentClick == 1 && comment.id == commentId" class="commentEdit">
+            <form class="commentEdit__form">
+              <div class="commentEdit__header"> 
+                <div class="profilImage"><p class="profilImage__p" v-if="getLetter()">{{ pseudoLetter }}</p></div>
+                <label for="commentEdit" aria-label="Texte de commentaire à modifier"></label>
+                <textarea id="commentEdit" name="textCommentEdit" v-model="editedCommentData.text" :placeholder="'Modifiez votre commentaire...'"></textarea>
+                <div class="commentEdit__image"> 
+                  <label for="imageCommentEdit" class="forumButton" aria-label="ajouter une image" title="Ajouter une image."><fa icon="images" /></label>
+                  <input type="file" id="imageCommentEdit" name="imageCommentEdit" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
+                </div>
+              </div>
+              <div class="commentEdit__buttons"> 
+                <button type="button" class="forumButton forumButton--red" @click="goBackToForum()" title="annuler la modification" aria-label="annuler la modification"><fa icon="reply" /></button>
+                <button type="button" class="forumButton" @click="editCommentData(commentId)" :disabled="!checkFormData(editedCommentData.text)"><fa icon="pencil" /></button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div>
-          <form>
-            <label for="comment">Texte</label>
-            <textarea id="comment" name="comment" v-model="commentData.text"></textarea>
-            <label for="commentImage">Image</label>
-            <input type="file" id="commentImage" name="commentImage" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
-            <button type="button" @click="createComment(post.id)" :disabled="!checkFormData(commentData.text)" >Publier</button>
+        <div class="createComment">
+          <form class="createComment__form">
+            <div class="createComment__header"> 
+              <div class="profilImage"><p class="profilImage__p" v-if="getLetter()">{{ pseudoLetter }}</p></div>
+              <label for="comment" aria-label="Texte du commentaire"></label>
+              <textarea id="comment" name="comment" v-model="commentData.text" :placeholder="'Écrivez un commentaire...'" ></textarea>
+              <div class="createComment__image"> 
+                <label for="commentImage" class="forumButton" aria-label="ajouter une image" title="Ajouter une image."><fa icon="images" /></label>
+                <input type="file" id="commentImage" name="commentImage" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
+              </div>
+            </div>
+            <div class="createComment__button"> 
+              <button type="button" class="forumButton" @click="createComment(post.id)" :disabled="!checkFormData(commentData.text)" >Publier</button>
+            </div>
           </form>
         </div>
       </article>
-      <div v-if="editClick == 1" class="post__edit">
-        <form>
-          <label for="postEdit">Texte</label>
-          <textarea id="postEdit" name="text" v-model="editedPostData.text"></textarea>
-          <label for="imageEdit">Image</label>
-          <input type="file" id="imageEdit" name="imageEdit" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
-          <button type="button" @click="goBackToForum()">Retour</button>
-          <button type="button" @click="editPostData(postId)" :disabled="!checkFormData(editedPostData.text)">Modifier</button>
-        </form>
-      </div>
-      <div v-if="commentClick == 1" class="comment__edit">
-        <form>
-          <label for="commentEdit">Texte</label>
-          <textarea id="commentEdit" name="textCommentEdit" v-model="editedCommentData.text"></textarea>
-          <label for="imageCommentEdit">Image</label>
-          <input type="file" id="imageCommentEdit" name="imageCommentEdit" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
-          <button type="button" @click="goBackToForum()">Retour</button>
-          <button type="button" @click="editCommentData(commentId)" :disabled="!checkFormData(editedCommentData.text)">Modifier</button>
-        </form>
-      </div>
     </div>
   </div>
 </template>
@@ -101,9 +135,12 @@ export default {
         editedCommentData: {},
         postId: null,
         commentId: null,
+        postCommentId: null,
         control: 0,
         commentsLimit: 3,
-        pseudoLetter: ""
+        showComments: 0,
+        pseudoLetter: "",
+        authorLetter: ""
       }
     },
     beforeMount() {
@@ -212,9 +249,11 @@ export default {
       goBackToForum() {
         if (this.editClick == 1) {
           this.editClick = 0;
+          this.editedPostData.text = "";
         }
         if (this.commentClick == 1) {
           this.commentClick = 0;
+          this.etitedCommentData.text = "";
         }
       },
       editPostData(postId) {
@@ -232,6 +271,7 @@ export default {
                 console.log(response);
                 this.editClick = 0;
                 this.control = 0;
+                this.editedPostData = "";
                 this.getAllPosts();
             })
             .catch(error => console.log(error))           
@@ -290,9 +330,11 @@ export default {
       },
       showMoreComments(allComments) {
         this.commentsLimit = allComments;
+        this.showComments = 1;
       },
       showLessComments() {
         this.commentsLimit = 3;
+        this.showComments = 0;
       },
       getLetter() {
             const userData = JSON.parse(localStorage.getItem("user"));
@@ -303,7 +345,15 @@ export default {
             } else {
                 return false;
             }
+      },
+      getLetterPost(author) {
+        if (author) {
+          this.authorLetter = author.slice(0, 1);
+          return true;
+        } else {
+          return false;
         }
+      }
     }
   
 }
@@ -330,15 +380,168 @@ export default {
     display: flex;
     flex-direction: column;
   }
-  .createPost__header {
+  .createPost__header, .comment__header, .createComment__header {
     display: flex;
-    
+    align-items: center;
+  }
+  .createComment {
+    margin: 0 2rem 2rem 2rem;
+    border-top: 1px solid #E4E6EB
+  }
+  .comment {
+    display: grid;
+    grid-template-columns: 1fr 14fr;
+    margin: 0 2rem 1rem 2rem;
+      &__author {
+      font-size: 1rem;
+      }
+      &__date {
+        font-size: 0.8rem;
+        padding-left: 1rem;
+      }
+      &__block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      &__blockUp {
+        background-color: #f7f7f7;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-right: 2rem;
+        width: 100%;
+      }
+      &__header {
+        width: 100%;
+        padding-left: 0.5rem;
+      }
+      &__buttons {
+        margin-top: 0.5rem;
+      }
+      &__buttons button {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.7rem;
+        margin-right: 0.5rem;
+      }
+      &__content {
+        padding-left: 0.5rem;
+        width: 100%;
+      }
+      &__text {
+        text-align: start;
+      }
+      &__image {
+        width: 100%;
+        height: 30vh;
+        object-fit: contain;
+        align-items: center;
+      }
+  }
+  .createPost__image {
+    padding-right: 1rem;
+  }
+  #getPostFile, #commentImage, #imageCommentEdit, #imageEdit {
+    display: none;
+  }
+  .postEdit {
+    margin: 0 2rem 1rem 2rem;
+    border-bottom: 1px solid #E4E6EB;
+      &__header {
+        display: flex;
+        align-items: center;
+      }
+      &__buttons {
+        text-align: start;
+        margin-bottom: 1rem;
+          & button {
+            margin-right: 1rem;
+          }
+      }
+  }
+  .commentEdit {
+    display: flex;
+    flex-direction: row;
+    grid-column: 1 / 3;
+      &__form {
+        width: 100%;
+      }
+      &__header {
+        display: flex;
+        align-items: center;
+      }
+      &__buttons {
+        text-align: start;
+        margin-left: 3.3rem;
+        & button {
+          margin-right: 0.5rem;
+          padding: 0.3rem 0.7rem;
+        }
+      }
+  }
+  .forumButton {
+    border: none;
+    background-color: #515ad1;
+    border-radius: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    color: white;
+    &:disabled {
+      cursor: not-allowed;
+      background: #909090;
+      &:hover {
+        transform: scale(1);
+        background: #909090;
+      }
+    }
+    &:hover {
+      background-color: #676fd7;
+      transform: scale(1.05);
+    }
+    &--red {
+      background-color: #d1515a;
+        &:hover {
+        background-color: #d7676f;
+        transform: scale(1.05);
+    }
+    }
+  }
+  .showButton {
+    border: none;
+    padding: 0.3rem;
+    margin: 0 2rem 1rem 2rem;
+    border-radius: 1.5rem;
+    cursor: pointer;
+  }
+  textarea {
+    border: none;
+    border-radius: 2rem;
+    background-color: #f7f7f7;
+    width: 100%;
+    margin: 1rem 1rem 1rem 0;
+    padding: 1.3rem 0.5rem 0.5rem 0.5rem;
+    resize: none;
+    &::placeholder {
+      padding: 0.15rem 0 0 0.2rem;
+    }
+    &:focus-visible {
+        outline: 2px solid #dd7d83;
+    }
+  }
+  .createPost__button {
+    border-top: 1px solid #E4E6EB;
+    margin: 0 2rem;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-evenly;
+
   }
   article {
     display: flex;
     flex-direction: column;
     width: 50vw;
-    margin: 0 auto;
+    margin: 0 auto 2rem auto;
     color: #091f43;
     background-color: white;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
@@ -356,6 +559,14 @@ export default {
   .post__date {
     font-size: 0.8rem;
     font-weight: 400;
+  }
+  .post__content {
+    border-top: 1px solid #E4E6EB;
+    border-bottom: 1px solid #E4E6EB;
+    margin: 0 2rem;
+  }
+  .post__text {
+    text-align: start;
   }
   .profilImage__p {
     background-color: #d1515a;
@@ -375,6 +586,18 @@ export default {
     display: flex;
     padding: 1rem;
 }
+.comment {
+  & .profilImage {
+    padding: 0.5rem 0 1rem 0;
+    display: block;
+  }
+  & .profilImage__p {
+    height: 2.2rem;
+    width: 2.2rem;
+    font-size: 1rem;
+    margin-right: 1rem;
+  }
+}
 .post__author {
   display: flex;
   flex-direction: column;
@@ -386,13 +609,9 @@ export default {
 .post__buttons {
   display: flex;
   justify-content: center;
-  & button {
-    background: none;
-    border: none;
-    color: white;
-    &:hover {
-      background: #0e48a7;
-    }
+  padding: 1rem 0;
+  & .forumButton {
+    margin: 0 3rem;
   }
 }
   .post__image {

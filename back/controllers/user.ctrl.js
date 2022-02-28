@@ -9,6 +9,8 @@ const dotenv            = require("dotenv").config();
 
 const User              = db.user;
 const Role              = db.role;
+const Post              = db.post;
+const Comment           = db.comment;
 const Op                = db.Sequelize.Op;
 
 // Schema for password strength
@@ -191,6 +193,14 @@ exports.modifyUser = (req, res, next) => {
                                   { expiresIn: 86400 } //24 hours
                                 ),
                               };
+                              if(req.body.pseudo){
+                                Post.update({author: req.body.pseudo}, { where : { authorId : user.id }})
+                                  .then(() => res.status(200).json({ message: "Author updated." }))
+                                  .catch((error) => res.status(500).json({ error }));
+                                Comment.update({author: req.body.pseudo}, { where : { authorId : user.id }})
+                                  .then(() => res.status(200).json({ message: "Author updated." }))
+                                  .catch((error) => res.status(500).json({ error }));
+                              }
                               res.status(200).json({ data });
                             })
                             .catch((error) => res.status(400).json({ error }));
@@ -233,6 +243,14 @@ exports.modifyUser = (req, res, next) => {
                           { expiresIn: 86400 } //24 hours
                         ),
                       };
+                      if(req.body.pseudo){
+                        Post.update({author: req.body.pseudo}, { where : { authorId : user.id }})
+                          .then(() => res.status(200).json({ message: "Author updated." }))
+                          .catch((error) => res.status(500).json({ error }));
+                        Comment.update({author: req.body.pseudo}, { where : { authorId : user.id }})
+                          .then(() => res.status(200).json({ message: "Author updated." }))
+                          .catch((error) => res.status(500).json({ error }));
+                      }
                       res.status(200).json({ data });
                     })
                     .catch((error) => res.status(400).json({ error }));
@@ -262,24 +280,4 @@ exports.deleteUser = (req, res, next) => {
       }
     })
     .catch((error) => res.status(400).json({ error }));
-};
-
-//exports.getAllPseudo = (req, res, next) => {
-//  User.findAll({ attributes : ["pseudo"] })
-//      .then(users => res.status(200).json(users))
-//      .catch(error => res.status(400).json({ error }));
-//}
-
-// Test auth
-exports.allAccess = (req, res) => {
-  res.status(200).send("Public Content.");
-};
-exports.userBoard = (req, res) => {
-  res.status(200).send("User Content.");
-};
-exports.adminBoard = (req, res) => {
-  res.status(200).send("Admin Content.");
-};
-exports.moderatorBoard = (req, res) => {
-  res.status(200).send("Moderator Content");
 };
