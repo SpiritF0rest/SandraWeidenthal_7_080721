@@ -98,14 +98,14 @@
             <div class="createComment__header"> 
               <div class="profilImage"><p class="profilImage__p" v-if="getLetter()">{{ pseudoLetter }}</p></div>
               <label for="comment" aria-label="Texte du commentaire"></label>
-              <textarea id="comment" name="comment" v-model="commentData.text" :placeholder="'Écrivez un commentaire...'" ></textarea>
+              <textarea id="comment" name="comment" v-model="commentText[post.id]" :placeholder="'Écrivez un commentaire...'" ></textarea>
               <div class="createComment__image"> 
                 <label for="commentImage" class="forumButton" aria-label="ajouter une image" title="Ajouter une image."><fa icon="images" /></label>
                 <input type="file" id="commentImage" name="commentImage" accept="image/png, image/jpeg, image/jpg" @change="uploadImage">
               </div>
             </div>
             <div class="createComment__button"> 
-              <button type="button" class="forumButton" @click="createComment(post.id)" :disabled="!checkFormData(commentData.text)" >Publier</button>
+              <button type="button" class="forumButton" @click="createComment(post.id), commentText = []" :disabled="!checkFormData(commentText[post.id])" >Publier</button>
             </div>
           </form>
         </div>
@@ -127,6 +127,7 @@ export default {
         userData: {data: {}},
         postData: {},
         commentData: {},
+        commentText: [],
         allPosts: [],
         postImage: "",
         editClick : 0,
@@ -221,7 +222,7 @@ export default {
         }
         formData.append('author', this.commentData.author);
         formData.append('authorId', this.commentData.authorId);
-        formData.append('text', this.commentData.text);
+        formData.append('text', this.commentText[postId]);
         formData.append('PostId', postId);
         axios
           .post("http://localhost:3000/api/comments/", formData)
@@ -431,6 +432,7 @@ export default {
       }
       &__text {
         text-align: start;
+        margin-top: 0;
       }
       &__image {
         width: 100%;

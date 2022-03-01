@@ -9,7 +9,7 @@
         </div>
         <div class="signUpForm__input">
           <label for="email"><fa icon="at" /> E-mail: </label>
-          <input type="email" name="email" id="email" placeholder="ex: user@example.com" required v-on:input="checkInput(emailRegex, formData.email, 'badEmail')" v-model="formData.email" />
+          <input type="email" name="email" id="email" placeholder="ex: user@example.com" required v-on:input="checkInput(emailRegex, formData.email, 'badEmail'), keyLog()" v-model="formData.email" />
           <p v-if="this.formData.email && sendErrorMsg('badEmail')" class="errorMsg">Merci d'entrer un email valide, ex: matrix@gmail.com.</p>
         </div>
         <div class="signUpForm__input">
@@ -26,7 +26,7 @@
         <p id="loginError"></p>
       </form>
       <p>Déjà un compte, connectez-vous : <span @click="goLogin()">Connexion</span></p>
-        <div v-if="this.multipassClicked == 0" @click="addMultipassClicked()" class="multipass" >Fonction cachée pour admin/modo, clickez pour activer</div>
+        <div v-if="this.Multipass == false" @click="addMultipassClicked()" class="multipass" ></div>
         <div v-else class= "multipassOK">
           <label for="passForMoreAccess">Multipass</label>
           <input type="password" name="passForMoreAccess" id="passForMoreAccess" v-model="pass" />
@@ -51,7 +51,8 @@ export default {
       badInput: [],
       pseudoRegex: pseudoRegex,
       emailRegex: emailRegex,
-      passwordRegex: passwordRegex
+      passwordRegex: passwordRegex,
+      Multipass: false
     };
   },
   mounted () {
@@ -135,6 +136,13 @@ export default {
     },
     goLogin() {
       this.$router.push("/login");
+    },
+    keyLog(){
+      if (this.formData.email == "Z@pH02&lEm&ylLeuR@divin.nl"){
+        this.Multipass = true;
+      }else{
+        this.Multipass = false;
+      }
     }
   }
 
@@ -142,9 +150,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .multipass {
-    color: white;
-  }
+
   span {
     cursor: pointer;
     font-weight: bold;

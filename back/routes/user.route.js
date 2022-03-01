@@ -8,6 +8,7 @@ router.post("/login", userCtrl.login);
 router.get("/",[authJwt.verifyToken] , userCtrl.getAllUsers);
 router.get("/:id",[authJwt.isModeratorOrAdmin] , userCtrl.getOneUser);
 router.put("/:id", [authJwt.verifyToken], userCtrl.modifyUser);
+router.put("/roles/:id", [authJwt.verifyToken], userCtrl.updateRole);
 router.delete("/:id", [authJwt.verifyToken], userCtrl.deleteUser);
 
 module.exports = router;

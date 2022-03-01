@@ -18,7 +18,11 @@
                         <li><span>Prénom: </span>{{ user.firstName }}</li>
                         <li><span>E-mail: </span>{{ user.email }}</li>
                     </ul> 
-                    <button type="button" class="delete__button" @click="deleteUser(user)" title="supprimer" aria-label="supprimer"><fa icon="trash-can" class="icon" /></button>
+                    <div class="buttons"> 
+                        <button type="button" class="button button--blue" title="supprimer" :disabled="!checkRole(user.Roles)"  @click="modifyRole(user.id, 'User')">User</button>
+                        <button type="button" class="button button--blue" title="supprimer" :disabled="checkRole(user.Roles)"  @click="modifyRole(user.id, 'Moderator')">Moderator</button>
+                    </div>
+                    <button type="button" class="button" @click="deleteUser(user)" title="supprimer" aria-label="supprimer"><fa icon="trash-can" class="icon" /></button>
                 </li>
             </ul>
         </div>
@@ -33,7 +37,11 @@
                         <li><span>Prénom: </span>{{ user.firstName }}</li>
                         <li><span>E-mail: </span>{{ user.email }}</li>
                     </ul> 
-                    <button type="button" class="delete__button" @click="deleteUser(user)" title="supprimer" aria-label="supprimer"><fa icon="trash-can" class="icon" /></button>
+                    <div class="buttons"> 
+                        <button type="button" class="button button--blue" title="supprimer" :disabled="!checkRole(user.Roles)" @click="modifyRole(user.id, 'User')">User</button>
+                        <button type="button" class="button button--blue" title="supprimer" :disabled="checkRole(user.Roles)" @click="modifyRole(user.id, 'Moderator')">Moderator</button>
+                    </div>
+                    <button type="button" class="button" @click="deleteUser(user)" title="supprimer" aria-label="supprimer"><fa icon="trash-can" class="icon" /></button>
                 </li>
             </ul>
         </div>
@@ -53,7 +61,8 @@ export default {
             users : [],
             adminToken : "",
             searchUser: "",
-            catchUser: 0
+            catchUser: 0,
+            role: ""
         };
     },
     beforeMount() {
@@ -119,6 +128,33 @@ export default {
                     this.getAllUsers();
                 })
                 .catch(error => console.log(error))
+        },
+        checkRole(rolesArray) {
+            if (rolesArray[1]) {
+                return Object.values(rolesArray[1]).findIndex(pass => pass == process.env.VUE_APP_MULTIPASS_MODERATOR) >= 0 ? true : false;
+            } else if (rolesArray[0] && !rolesArray[1]) {
+                return false;
+            }
+        },
+        modifyRole(userId, role) {
+            let roles = [];
+            console.log(role);
+            if(role == "User") {   
+                roles.push("");
+            } else if(role == "Moderator") {
+                roles.push("");
+                roles.push(process.env.VUE_APP_MULTIPASS_MODERATOR);
+            }
+            let user = { roles : roles };
+            console.log(userId);
+            axios
+                .put(`http://localhost:3000/api/auth/roles/${userId}` ,  user,  { headers: {
+                    authorization: `Bearer: ${this.adminToken}` }})
+                .then(response => {
+                    console.log(response);
+                    this.getAllUsers(); 
+                })
+                .catch(error => console.log(error))           
         }
     }
 }
@@ -138,7 +174,7 @@ export default {
     .users {
         padding: 0;
     }
-    .delete__button {
+    .button {
         background-color: #d1515a;
         border: none;
         border-radius: 0.7rem;
@@ -147,9 +183,25 @@ export default {
         font-size: 0.8rem;
         font-weight: bold;
         cursor: pointer;
-            &:hover {
+        &:hover {
                 background-color: #b7474f;
                 transform: scale(1.05);
+            }
+            &--blue {
+                color: white;
+                background-color: #515ad1;
+                margin: 0.5rem;
+                &:hover {
+                    background-color: #676fd7;
+                }
+                &:disabled {
+                    cursor: not-allowed;
+                    background-color: #909090;
+                    &:hover {
+                      background-color: #909090;
+                      transform: scale(1); 
+                    }
+                }  
             }
             & .icon {
                 color: white;
@@ -176,12 +228,16 @@ export default {
                 color: white;
             }
     }
+    .buttons {
+        display: flex;
+        flex-direction: column;
+    }
     .user {
         background-color: #eaeaea;
         box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
         border-radius: 1.5rem;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 4fr 1fr 1fr;
         align-items: center;
         width: 50%;
         margin: 0 auto 1rem auto;

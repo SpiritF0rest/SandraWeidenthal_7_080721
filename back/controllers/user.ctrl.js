@@ -281,3 +281,27 @@ exports.deleteUser = (req, res, next) => {
     })
     .catch((error) => res.status(400).json({ error }));
 };
+
+exports.updateRole = (req, res, next) => {
+  User.findByPk(req.params.id)
+  .then((user) => {
+    if (req.body.roles) {
+      Role.findAll({
+        where: {
+          multipass: {
+            [Op.or]: req.body.roles,
+          },
+        },
+      }).then((roles) => {
+        user.setRoles(roles).then(() => {
+          res.send({ message: "User created." });
+        });
+      });
+    } else {
+      user.setRoles([1]).then(() => {
+        res.send({ message: "User created" });
+      });
+    }
+  })
+  .catch((error) => res.status(400).json({ error }));
+}
