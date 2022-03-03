@@ -144,226 +144,216 @@ export default {
         authorLetter: ""
       }
     },
-    beforeMount() {
-      if (!localStorage.getItem("user")) {
-        this.$router.push("/login");
+  beforeMount() {
+    if (!localStorage.getItem("user")) {
+      this.$router.push("/login");
     }
-    },
-    mounted() {
-      this.createUserData(), 
-      this.getAllPosts()
-    },
-    methods : {
-      createUserData() {
-        if (localStorage.getItem("user")) {
-          try {
-              this.userData = JSON.parse(localStorage.getItem("user"));
-              console.log(this.userData);
-          } catch(e) {
-            localStorage.removeItem("user");
-            console.log("Données corrompues");
-          }
-        }
-      },
-      checkUser(author) {
-        if (author == this.userData.data.id) {
-          return true;
-        } else {
-          return false;
-        }
-      },
-      checkUserAndModerator(author) {
-        if(this.userData.data.roles[1] || author == this.userData.data.id) {
-          return true;
-        } else {
-          return false;
-        }
-      },
-      checkAdmin(author) {
-        if(author == this.userData.data.pseudo) {
-          return true;
-        } else if (author == "Admin") {
-          return false;
-        }
-      },
-      checkFormData(data) {
-        if(!data && !this.postImage){
-          return false;
-        } else {
-          return true;
-        }
-      },
-      uploadImage(e) {
-        this.control = 1;
-        const file = e.target.files[0];
-        console.log(file);
-        this.postImage = file;            //renommer par un terme plus général
-      },
-      createPost() {
-        this.postData.author = this.userData.data.pseudo;
-        this.postData.authorId = this.userData.data.id;
-        let formData = new FormData();
-        if (this.control == 1) {
-          formData.append('file', this.postImage, this.postImage.name);
-        }
-        formData.append('author', this.postData.author);
-        formData.append('authorId', this.postData.authorId);
-        formData.append('text', this.postData.text);
-        axios
-          .post("http://localhost:3000/api/posts/", formData)
-          .then(response => {
-            console.log(response);
-            this.postData.text = "";
-            this.postImage = "";
-            this.control = 0;
-            this.getAllPosts();
-          })
-          .catch(error => console.log(error));
-      },
-      createComment(postId) {
-        this.commentData.author = this.userData.data.pseudo;
-        this.commentData.authorId = this.userData.data.id;
-        let formData = new FormData();
-        if (this.control == 1) {
-          formData.append('file', this.postImage, this.postImage.name);
-        }
-        formData.append('author', this.commentData.author);
-        formData.append('authorId', this.commentData.authorId);
-        formData.append('text', this.commentText[postId]);
-        formData.append('PostId', postId);
-        axios
-          .post("http://localhost:3000/api/comments/", formData)
-          .then(response => {
-            console.log(response);
-            this.commentData.text = "";
-            this.commentImage = "";
-            this.control = 0;
-            this.getAllPosts();
-          })
-          .catch(error => console.log(error));
-      },
-      editPost(postId) {
-        if (this.editClick == 0 ) {
-          this.editClick = 1;
-          this.postId = postId;
-        }
-      },
-      editComment(commentId) {
-        if (this.commentClick == 0 ) {
-          this.commentClick = 1;
-          this.commentId = commentId;
-        }
-      },
-      goBackToForum() {
-        if (this.editClick == 1) {
-          this.editClick = 0;
-          this.editedPostData.text = "";
-        }
-        if (this.commentClick == 1) {
-          this.commentClick = 0;
-          this.etitedCommentData.text = "";
-        }
-      },
-      editPostData(postId) {
-        let formData = new FormData();
-        if(this.editedPostData.text) {
-          formData.append('text', this.editedPostData.text);
-        }
-        if(this.postImage && this.control == 1) {
-          formData.append('file', this.postImage, this.postImage.name);
-        }
-        axios
-            .put("http://localhost:3000/api/posts/" + postId, formData , { headers: {
-                authorization: `Bearer: ${this.userData.data.token}` }})
-            .then(response => {
-                console.log(response);
-                this.editClick = 0;
-                this.control = 0;
-                this.editedPostData = "";
-                this.getAllPosts();
-            })
-            .catch(error => console.log(error))           
-      },
-      editCommentData(commentId) {
-        let formData = new FormData();
-        if(this.editedCommentData.text) {
-          formData.append('text', this.editedCommentData.text);
-        }
-        if(this.postImage && this.control == 1) {
-          formData.append('file', this.postImage, this.postImage.name);
-        }
-        axios
-            .put("http://localhost:3000/api/comments/" + commentId, formData , { headers: {
-                authorization: `Bearer: ${this.userData.data.token}` }})
-            .then(response => {
-                console.log(response);
-                this.commentClick = 0;
-                this.control = 0;
-                this.getAllPosts();
-            })
-            .catch(error => console.log(error))           
-      },
-      getAllPosts() {
-        axios
-          .get("http://localhost:3000/api/posts/")
-          .then(response => {
-            if(response.data.length > 0) {
-              console.log(response.data);
-              this.allPosts = response.data;
-            } else {
-              console.log("Il n'y a pas encore de Post.");
-            }
-          })
-          .catch(error => console.log(error + "Echec lors de la récupération des posts."))
-      },
-      deletePost(postId) {
-        axios
-          .delete("http://localhost:3000/api/posts/" + postId, { headers: {
-              authorization: `Bearer: ${this.userData.data.token}` }})
-          .then(response => {
-              console.log(response);
-              location.reload();
-          })
-          .catch(error => console.log(error))
-      },
-      deleteComment(commentId) {
-        axios
-          .delete("http://localhost:3000/api/comments/" + commentId, { headers: {
-              authorization: `Bearer: ${this.userData.data.token}` }})
-          .then(response => {
-              console.log(response);
-              this.getAllPosts();
-          })
-          .catch(error => console.log(error))
-      },
-      showMoreComments(allComments) {
-        this.commentsLimit = allComments;
-        this.showComments = 1;
-      },
-      showLessComments() {
-        this.commentsLimit = 3;
-        this.showComments = 0;
-      },
-      getLetter() {
-            const userData = JSON.parse(localStorage.getItem("user"));
-            if (userData) {
-                const userPseudo = userData.data.pseudo;
-                this.pseudoLetter = userPseudo.slice(0, 1);
-                return true;
-            } else {
-                return false;
-            }
-      },
-      getLetterPost(author) {
-        if (author) {
-          this.authorLetter = author.slice(0, 1);
-          return true;
-        } else {
-          return false;
+  },
+  mounted() {
+    this.createUserData(), 
+    this.getAllPosts()
+  },
+  methods : {
+    createUserData() {
+      if (localStorage.getItem("user")) {
+        try {
+          this.userData = JSON.parse(localStorage.getItem("user"));
+        } catch(e) {
+          localStorage.removeItem("user");
+          console.log("Données corrompues");
         }
       }
+    },
+    checkUser(author) {
+      if (author == this.userData.data.id) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    checkUserAndModerator(author) {
+      if(this.userData.data.roles[1] || author == this.userData.data.id) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    checkAdmin(author) {
+      if(author == this.userData.data.pseudo) {
+        return true;
+      } else if (author == "Admin") {
+        return false;
+      }
+    },
+    checkFormData(data) {
+      if(!data && !this.postImage){
+        return false;
+      } else {
+        return true;
+      }
+    },
+    uploadImage(e) {
+      this.control = 1;
+      const file = e.target.files[0];
+      this.postImage = file;            //renommer par un terme plus général
+    },
+    createPost() {
+      this.postData.author = this.userData.data.pseudo;
+      this.postData.authorId = this.userData.data.id;
+      let formData = new FormData();
+      if (this.control == 1) {
+        formData.append('file', this.postImage, this.postImage.name);
+      }
+      formData.append('author', this.postData.author);
+      formData.append('authorId', this.postData.authorId);
+      formData.append('text', this.postData.text);
+      axios
+        .post("http://localhost:3000/api/posts/", formData)
+        .then(() => {
+          this.postData.text = "";
+          this.postImage = "";
+          this.control = 0;
+          this.getAllPosts();
+        })
+        .catch(error => console.log(error));
+    },
+    createComment(postId) {
+      this.commentData.author = this.userData.data.pseudo;
+      this.commentData.authorId = this.userData.data.id;
+      let formData = new FormData();
+      if (this.control == 1) {
+        formData.append('file', this.postImage, this.postImage.name);
+      }
+      formData.append('author', this.commentData.author);
+      formData.append('authorId', this.commentData.authorId);
+      formData.append('text', this.commentText[postId]);
+      formData.append('PostId', postId);
+      axios
+        .post("http://localhost:3000/api/comments/", formData)
+        .then(() => {
+          this.commentData.text = "";
+          this.commentImage = "";
+          this.control = 0;
+          this.getAllPosts();
+        })
+        .catch(error => console.log(error));
+    },
+    editPost(postId) {
+      if (this.editClick == 0 ) {
+        this.editClick = 1;
+        this.postId = postId;
+      }
+    },
+    editComment(commentId) {
+      if (this.commentClick == 0 ) {
+        this.commentClick = 1;
+        this.commentId = commentId;
+      }
+    },
+    goBackToForum() {
+      if (this.editClick == 1) {
+        this.editClick = 0;
+        this.editedPostData.text = "";
+      }
+      if (this.commentClick == 1) {
+        this.commentClick = 0;
+        this.etitedCommentData.text = "";
+      }
+    },
+    editPostData(postId) {
+      let formData = new FormData();
+      if(this.editedPostData.text) {
+        formData.append('text', this.editedPostData.text);
+      }
+      if(this.postImage && this.control == 1) {
+        formData.append('file', this.postImage, this.postImage.name);
+      }
+      axios
+          .put("http://localhost:3000/api/posts/" + postId, formData , { headers: {
+              authorization: `Bearer: ${this.userData.data.token}` }})
+          .then(() => {
+              this.editClick = 0;
+              this.control = 0;
+              this.editedPostData = "";
+              this.getAllPosts();
+          })
+          .catch(error => console.log(error))           
+    },
+    editCommentData(commentId) {
+      let formData = new FormData();
+      if(this.editedCommentData.text) {
+        formData.append('text', this.editedCommentData.text);
+      }
+      if(this.postImage && this.control == 1) {
+        formData.append('file', this.postImage, this.postImage.name);
+      }
+      axios
+        .put("http://localhost:3000/api/comments/" + commentId, formData , { headers: {
+          authorization: `Bearer: ${this.userData.data.token}` }})
+        .then(() => {
+          this.commentClick = 0;
+          this.control = 0;
+          this.getAllPosts();
+        })
+        .catch(error => console.log(error))           
+    },
+    getAllPosts() {
+      axios
+        .get("http://localhost:3000/api/posts/")
+        .then(response => {
+          if(response.data.length > 0) {
+            this.allPosts = response.data;
+          } else {
+            console.log("Il n'y a pas encore de Post.");
+          }
+        })
+        .catch(error => console.log(error + "Echec lors de la récupération des posts."))
+    },
+    deletePost(postId) {
+      axios
+        .delete("http://localhost:3000/api/posts/" + postId, { headers: {
+            authorization: `Bearer: ${this.userData.data.token}` }})
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => console.log(error))
+    },
+    deleteComment(commentId) {
+      axios
+        .delete("http://localhost:3000/api/comments/" + commentId, { headers: {
+            authorization: `Bearer: ${this.userData.data.token}` }})
+        .then(() => {
+            this.getAllPosts();
+        })
+        .catch(error => console.log(error))
+    },
+    showMoreComments(allComments) {
+      this.commentsLimit = allComments;
+      this.showComments = 1;
+    },
+    showLessComments() {
+      this.commentsLimit = 3;
+      this.showComments = 0;
+    },
+    getLetter() {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (userData) {
+        const userPseudo = userData.data.pseudo;
+        this.pseudoLetter = userPseudo.slice(0, 1);
+        return true;
+      } else {
+        return false;
+      }
+    },
+    getLetterPost(author) {
+      if (author) {
+        this.authorLetter = author.slice(0, 1);
+        return true;
+      } else {
+        return false;
+      }
     }
-  
+  }
 }
 </script>
 
@@ -400,53 +390,53 @@ export default {
     display: grid;
     grid-template-columns: 1fr 14fr;
     margin: 0 2rem 1rem 2rem;
-      &__author {
+    &__author {
       font-size: 1rem;
-      }
-      &__date {
-        font-size: 0.8rem;
-        padding-left: 1rem;
-      }
-      &__block {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      &__blockUp {
-        background-color: #f7f7f7;
-        border-radius: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        margin-right: 2rem;
-        width: 100%;
-      }
-      &__header {
-        width: 100%;
-        padding-left: 0.5rem;
-      }
-      &__buttons {
-        margin-top: 0.5rem;
-      }
-      &__buttons button {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.7rem;
-        margin-right: 0.5rem;
-      }
-      &__content {
-        padding-left: 0.5rem;
-        width: 100%;
-      }
-      &__text {
-        text-align: start;
-        margin-top: 0;
-      }
-      &__image {
-        width: 100%;
-        height: 30vh;
-        object-fit: contain;
-        align-items: center;
-      }
+    }
+    &__date {
+      font-size: 0.8rem;
+      padding-left: 1rem;
+    }
+    &__block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    &__blockUp {
+      background-color: #f7f7f7;
+      border-radius: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-right: 2rem;
+      width: 100%;
+    }
+    &__header {
+      width: 100%;
+      padding-left: 0.5rem;
+    }
+    &__buttons {
+      margin-top: 0.5rem;
+    }
+    &__buttons button {
+      font-size: 0.7rem;
+      padding: 0.3rem 0.7rem;
+      margin-right: 0.5rem;
+    }
+    &__content {
+      padding-left: 0.5rem;
+      width: 100%;
+    }
+    &__text {
+      text-align: start;
+      margin-top: 0;
+    }
+    &__image {
+      width: 100%;
+      height: 30vh;
+      object-fit: contain;
+      align-items: center;
+    }
   }
   .createPost__image {
     padding-right: 1rem;
@@ -457,37 +447,37 @@ export default {
   .postEdit {
     margin: 0 2rem 1rem 2rem;
     border-bottom: 1px solid #E4E6EB;
-      &__header {
-        display: flex;
-        align-items: center;
+    &__header {
+      display: flex;
+      align-items: center;
+    }
+    &__buttons {
+      text-align: start;
+      margin-bottom: 1rem;
+      & button {
+        margin-right: 1rem;
       }
-      &__buttons {
-        text-align: start;
-        margin-bottom: 1rem;
-          & button {
-            margin-right: 1rem;
-          }
-      }
+    }
   }
   .commentEdit {
     display: flex;
     flex-direction: row;
     grid-column: 1 / 3;
-      &__form {
-        width: 100%;
+    &__form {
+      width: 100%;
+    }
+    &__header {
+      display: flex;
+      align-items: center;
+    }
+    &__buttons {
+      text-align: start;
+      margin-left: 3.3rem;
+      & button {
+        margin-right: 0.5rem;
+        padding: 0.3rem 0.7rem;
       }
-      &__header {
-        display: flex;
-        align-items: center;
-      }
-      &__buttons {
-        text-align: start;
-        margin-left: 3.3rem;
-        & button {
-          margin-right: 0.5rem;
-          padding: 0.3rem 0.7rem;
-        }
-      }
+    }
   }
   .forumButton {
     border: none;
@@ -510,10 +500,10 @@ export default {
     }
     &--red {
       background-color: #d1515a;
-        &:hover {
+      &:hover {
         background-color: #d7676f;
         transform: scale(1.05);
-    }
+      }
     }
   }
   .showButton {
@@ -535,7 +525,7 @@ export default {
       padding: 0.15rem 0 0 0.2rem;
     }
     &:focus-visible {
-        outline: 2px solid #dd7d83;
+      outline: 2px solid #dd7d83;
     }
   }
   .createPost__button {
@@ -544,7 +534,6 @@ export default {
     padding: 1rem 0;
     display: flex;
     justify-content: space-evenly;
-
   }
   article {
     display: flex;
@@ -555,10 +544,10 @@ export default {
     background-color: white;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
     border-radius: 0.5rem 0.5rem;
-      & h2 {
-        font-size: 1.2rem;
-        margin: 1rem 0 0.5rem 0;
-      }
+    & h2 {
+      font-size: 1.2rem;
+      margin: 1rem 0 0.5rem 0;
+    }
   }
   .post__header {
     display: flex;
@@ -589,53 +578,53 @@ export default {
     justify-content: center;   
     border-radius: 50%;
     margin: 0;
-}
-.profilImage {
+  }
+  .profilImage {
     justify-content: center;
     display: flex;
     padding: 1rem;
-}
-.comment {
-  & .profilImage {
-    padding: 0.5rem 0 1rem 0;
-    display: block;
   }
-  & .profilImage__p {
-    height: 2.2rem;
-    width: 2.2rem;
-    font-size: 1rem;
-    margin-right: 1rem;
-  }
-}
-.post__author {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-    & p {
-       margin: 0 0 0.5rem 0;
+  .comment {
+    & .profilImage {
+      padding: 0.5rem 0 1rem 0;
+      display: block;
     }
-}
-.post__buttons {
-  display: flex;
-  justify-content: center;
-  padding: 1rem 0;
-  & .forumButton {
-    margin: 0 3rem;
+    & .profilImage__p {
+      height: 2.2rem;
+      width: 2.2rem;
+      font-size: 1rem;
+      margin-right: 1rem;
+    }
   }
-}
+  .post__author {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    & p {
+      margin: 0 0 0.5rem 0;
+    }
+  }
+  .post__buttons {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    & .forumButton {
+      margin: 0 3rem;
+    }
+  }
   .post__image {
     height: 15rem;
   }
-@media screen and (min-width: 768px) and (max-width: 1199px) {
-  .createPost, .post {
-    margin : 0 2vw 2vw 2vw;
-    width: 96vw;
+  @media screen and (min-width: 768px) and (max-width: 1199px) {
+    .createPost, .post {
+      margin : 0 2vw 2vw 2vw;
+      width: 96vw;
+    }
   }
-}
-@media screen and (max-width: 767px) {
-  .createPost, .post {
-    width: 100vw;
-    border-radius: 0;
+  @media screen and (max-width: 767px) {
+    .createPost, .post {
+      width: 100vw;
+      border-radius: 0;
+    }
   }
-}
 </style>

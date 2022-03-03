@@ -102,9 +102,6 @@ export default {
       height: 100%;
       object-fit: cover;
       border-radius: 2rem;
-  }
-  }
-  @media screen and (min-width: 576) and (max-width: 767px) {
-
+    }
   }
 </style>

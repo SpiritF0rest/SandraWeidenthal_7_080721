@@ -380,9 +380,9 @@ h1 {
   }
   .signUpForm {
   width: 100%;
-  &__input {
-    border-radius: 0;
-  }
+    &__input {
+      border-radius: 0;
+    }
   }
 }
 </style>

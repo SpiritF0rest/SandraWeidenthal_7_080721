@@ -1,7 +1,7 @@
 <template>
   <header>
     <div class="logo">
-    <img alt="Vue logo" src="../assets/logo_groupomania_white.svg">
+      <img alt="Vue logo" src="../assets/logo_groupomania_white.svg">
     </div>
     <nav>
       <ul>
@@ -18,7 +18,6 @@
         </div>
       </ul>
     </nav>
-
   </header>
 </template>
 
@@ -37,7 +36,6 @@ export default {
   methods: {
     checkLogin() {
       if (localStorage.getItem("user")) {
-        console.log("login");
         this.login = true;
       } else {
         this.login = false;
@@ -61,67 +59,65 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-header {
-  background-color: #515ad1;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem 1rem 1rem 3rem;
-}
-ul {
-  display: flex;
-  justify-content: space-between;
-  list-style-type: none;
-  padding: 0;
+  header {
+    background-color: #515ad1;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1rem 1rem 3rem;
+  }
+  ul {
+    display: flex;
+    justify-content: space-between;
+    list-style-type: none;
+    padding: 0;
     div {
       display: flex;
     }
-}
-li {
-  margin: 0 2rem;
-}
-a {
-  color: white;
-  font-size: 1.3rem;
-  font-weight: bold;
-  text-decoration: none;
-  
-}
-a:hover {
-  color: #d2d2d2;
-}
-.powerBtn {
-  border-style: none;
-  background-color: #515ad1;
-  cursor: pointer;
-  &__icon {
+  }
+  li {
+    margin: 0 2rem;
+  }
+  a {
     color: white;
     font-size: 1.3rem;
-    &:hover {
-      color: #d2d2d2;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  a:hover {
+    color: #d2d2d2;
+  }
+  .powerBtn {
+    border-style: none;
+    background-color: #515ad1;
+    cursor: pointer;
+    &__icon {
+      color: white;
+      font-size: 1.3rem;
+      &:hover {
+        color: #d2d2d2;
+      }
     }
   }
-}
-.logo {
-  display: flex;
-  align-items: center;
-}
-img {
-  height: 2.5rem;
-}
-@media screen and (max-width: 991px) {
-  nav {
-    & ul {
-    justify-content: center
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  img {
+    height: 2.5rem;
+  }
+  @media screen and (max-width: 991px) {
+    nav {
+      & ul {
+      justify-content: center
+      }
+      & span {
+      display: none;
+      }
     }
-    & span {
-    display: none;
+    header {
+      flex-direction: column;
+      padding: 1rem;
+    }
   }
-  }
-  header {
-    flex-direction: column;
-    padding: 1rem;
-  }
-}
 </style>

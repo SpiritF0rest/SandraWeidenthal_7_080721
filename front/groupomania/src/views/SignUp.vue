@@ -40,7 +40,6 @@
 <script>
 import axios from 'axios';
 import { pseudoRegex, emailRegex, passwordRegex  } from '../helpers/regex';
-
 export default {
   name: 'SignUp',
   components: {
@@ -147,12 +146,10 @@ export default {
       }
     }
   }
-
 }
 </script>
 
 <style scoped lang="scss">
-
   span {
     cursor: pointer;
     font-weight: bold;
@@ -177,7 +174,6 @@ export default {
   }
   .errorMsg {
     font-size: 0.8rem;
-    //grid-column: 1/3;
   }
   .button__validation{
     margin-top: 1.5rem;
