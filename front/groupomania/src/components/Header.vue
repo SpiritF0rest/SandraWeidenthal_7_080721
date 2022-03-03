@@ -7,9 +7,8 @@
       <ul>
         <div class="nav__bar">
           <li v-if="this.login == true"><router-link to="/"><fa icon="house" /> Home</router-link></li>
-          <li v-if="this.login == true"><router-link to="/forum"><fa icon="icons" /> Forum</router-link></li>
-          <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board">ModoBoard</router-link></li>
-          <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board">AdminBoard</router-link></li>
+          <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board"><fa icon="shield" /> ModoBoard</router-link></li>
+          <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board"><fa icon="user-shield" /> AdminBoard</router-link></li>
         </div>
         <div class="connexion__bar">
           <li v-if="this.login == false"><router-link to="/signup">Inscription</router-link></li>

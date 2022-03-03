@@ -1,36 +1,39 @@
 <template>
   <div class="signInUp__container">
+    <div class="logo"> 
+      <img alt="Vue logo" src="../../public/icon.svg" />
+    </div>
     <h1>Inscription</h1>
-      <form class="signUpForm">
-        <div class="signUpForm__input">
-          <label for="pseudo"><fa icon="user" /> Pseudo: </label>
-          <input type="text" name="pseudo" id="pseudo" placeholder="ex: User01" required v-on:input="checkInput(pseudoRegex, formData.pseudo, 'badPseudo')" v-model="formData.pseudo" />
-          <p v-if="this.formData.pseudo && sendErrorMsg('badPseudo')" class="errorMsg">Merci d'entrer un pseudo valide, ex: NeoRed_01.</p>
-        </div>
-        <div class="signUpForm__input">
-          <label for="email"><fa icon="at" /> E-mail: </label>
-          <input type="email" name="email" id="email" placeholder="ex: user@example.com" required v-on:input="checkInput(emailRegex, formData.email, 'badEmail'), keyLog()" v-model="formData.email" />
-          <p v-if="this.formData.email && sendErrorMsg('badEmail')" class="errorMsg">Merci d'entrer un email valide, ex: matrix@gmail.com.</p>
-        </div>
-        <div class="signUpForm__input">
-          <label for="password"><fa icon="key" /> Mot de passe: </label>
-          <input type="password" name="password" id="password" placeholder="ex: p7C_5v69S" required minlength="8" v-on:input="checkInput(passwordRegex, formData.password, 'badPassword')" v-model="formData.password" />
-          <p v-if="this.formData.password && sendErrorMsg('badPassword')" class="errorMsg">Minimum requis: 8 Caractères, 1 Maj, 1 Min, 1 Chiffe, 1 Symbole.</p>
-        </div>
-        <div class="signUpForm__input">
-          <label for="passwordConfirmation">Confirmation mot de passe: </label>
-          <input type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="ex: p7C_5v69S" required minlength="8" v-model="formData.passwordConfirmation" />
-          <p v-if="formData.password && formData.passwordConfirmation && formData.password != formData.passwordConfirmation" class="errorMsg">Merci d'entrer un mot de passe identique.</p>
-        </div>
-        <button type="button" @click="signUp()" :disabled="!checkFormData()" class="button__validation">Envoyer</button>
-        <p id="loginError"></p>
-      </form>
-      <p>Déjà un compte, connectez-vous : <span @click="goLogin()">Connexion</span></p>
-        <div v-if="this.Multipass == false" @click="addMultipassClicked()" class="multipass" ></div>
-        <div v-else class= "multipassOK">
-          <label for="passForMoreAccess">Multipass</label>
-          <input type="password" name="passForMoreAccess" id="passForMoreAccess" v-model="pass" />
-        </div>
+    <form class="signUpForm">
+      <div class="signUpForm__input">
+        <label for="pseudo"><fa icon="user" /> Pseudo: </label>
+        <input type="text" name="pseudo" id="pseudo" placeholder="ex: User01" required v-on:input="checkInput(pseudoRegex, formData.pseudo, 'badPseudo')" v-model="formData.pseudo" />
+        <p v-if="this.formData.pseudo && sendErrorMsg('badPseudo')" class="errorMsg">Merci d'entrer un pseudo valide, ex: NeoRed_01.</p>
+      </div>
+      <div class="signUpForm__input">
+        <label for="email"><fa icon="at" /> E-mail: </label>
+        <input type="email" name="email" id="email" placeholder="ex: user@example.com" required v-on:input="checkInput(emailRegex, formData.email, 'badEmail'), keyLog()" v-model="formData.email" />
+        <p v-if="this.formData.email && sendErrorMsg('badEmail')" class="errorMsg">Merci d'entrer un email valide, ex: matrix@gmail.com.</p>
+      </div>
+      <div class="signUpForm__input">
+        <label for="password"><fa icon="key" /> Mot de passe: </label>
+        <input type="password" name="password" id="password" placeholder="ex: p7C_5v69S" required minlength="8" v-on:input="checkInput(passwordRegex, formData.password, 'badPassword')" v-model="formData.password" />
+        <p v-if="this.formData.password && sendErrorMsg('badPassword')" class="errorMsg">Minimum requis: 8 Caractères, 1 Maj, 1 Min, 1 Chiffe, 1 Symbole.</p>
+      </div>
+      <div class="signUpForm__input">
+        <label for="passwordConfirmation">Confirmation mot de passe: </label>
+        <input type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="ex: p7C_5v69S" required minlength="8" v-model="formData.passwordConfirmation" />
+        <p v-if="formData.password && formData.passwordConfirmation && formData.password != formData.passwordConfirmation" class="errorMsg">Merci d'entrer un mot de passe identique.</p>
+      </div>
+      <button type="button" @click="signUp()" :disabled="!checkFormData()" class="button__validation">Envoyer</button>
+      <p id="loginError"></p>
+    </form>
+    <p>Déjà un compte, connectez-vous : <span @click="goLogin()">Connexion</span></p>
+    <div v-if="this.Multipass == false" @click="addMultipassClicked()" class="multipass" ></div>
+    <div v-else class= "multipassOK">
+      <label for="passForMoreAccess">Multipass</label>
+      <input type="password" name="passForMoreAccess" id="passForMoreAccess" placeholder="une formule magique..." v-model="pass" />
+    </div>
   </div>
 </template>
 
@@ -123,8 +126,7 @@ export default {
       this.createUserData();
         axios
           .post("http://localhost:3000/api/auth/signUp", this.formData)
-          .then(response => {
-            console.log(response);
+          .then(() => {
             this.multipassWords = [];
             this.$router.push("/login")
           })
@@ -138,7 +140,7 @@ export default {
       this.$router.push("/login");
     },
     keyLog(){
-      if (this.formData.email == "Z@pH02&lEm&ylLeuR@divin.nl"){
+      if (this.formData.email == "Aziz Light!"){
         this.Multipass = true;
       }else{
         this.Multipass = false;
@@ -182,5 +184,26 @@ export default {
   }
   fa {
     color: #091f43;
+  }
+  .logo {
+    height: 15vh;
+    margin: 0 auto;
+    & img {
+      height: 100%;
+      width: 100%;
+      border-radius: 2rem;
+    }
+  }
+  .multipassOK {
+    & input {
+      border: none;
+      background-color: #eaeaea;
+      border-radius: 0.3rem;
+      padding: 0.2rem;
+      margin-left: 1rem;
+      &::placeholder {
+        padding-left: 0.3rem;
+      }
+    }
   }
 </style>

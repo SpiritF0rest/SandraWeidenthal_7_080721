@@ -87,15 +87,17 @@ export default {
         },
         deleteUser(user) {
             this.getModoToken();
-            axios
-                .delete("http://localhost:3000/api/auth/" + user.id, { headers: {
-                    authorization: `Bearer: ${this.moderatorToken}` }})
-                .then(response => {
-                    console.log(response);
-                    alert(response);
-                    this.getAllUsers();
-                })
-                .catch(error => console.log(error))
+            if(window.confirm("Etes-vous sûr de vouloir supprimer ce compte ?")) {
+                axios
+                    .delete("http://localhost:3000/api/auth/" + user.id, { headers: {
+                        authorization: `Bearer: ${this.moderatorToken}` }})
+                    .then(response => {
+                        console.log(response);
+                        alert(response);
+                        this.getAllUsers();
+                    })
+                    .catch(error => console.log(error))
+            }
         }
     }
 }

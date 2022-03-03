@@ -1,19 +1,22 @@
 <template>
-<div class="signInUp__container">
+  <div class="signInUp__container">
+    <div class="logo"> 
+      <img alt="Vue logo" src="../assets/icon-above-font.png" />
+    </div>
     <h1>Connexion</h1>
-      <form class="loginForm">
-        <div class="loginForm__input">
-          <label for="pseudo"><fa icon="user" /> Pseudo: </label>
-          <input type="text" name="pseudo" id="pseudo" placeholder="ex: User01" required v-model="formData.pseudo" />
-        </div>
-        <div class="loginForm__input">
-          <label for="password"><fa icon="key" /> Mot de passe: </label>
-          <input type="password" name="password" id="password" placeholder="ex: p7C_5v69S" required minlength="8" v-model="formData.password" />
-        </div>
-        <button @click="login()" type="button" :disabled="checkFormData()" class="button__validation">Connexion</button>
-        <p id="loginError"></p>
-      </form>
-      <p class="info">Pas encore de compte, créez en un : <span @click="goSignUp()">Inscription</span></p>
+    <form class="loginForm">
+      <div class="loginForm__input">
+        <label for="pseudo"><fa icon="user" /> Pseudo: </label>
+        <input type="text" name="pseudo" id="pseudo" placeholder="ex: User01" required v-model="formData.pseudo" />
+      </div>
+      <div class="loginForm__input">
+        <label for="password"><fa icon="key" /> Mot de passe: </label>
+        <input type="password" name="password" id="password" placeholder="ex: p7C_5v69S" required minlength="8" v-model="formData.password" />
+      </div>
+      <button @click="login()" type="button" :disabled="checkFormData()" class="button__validation">Connexion</button>
+      <p id="loginError"></p>
+    </form>
+    <p class="info">Pas encore de compte, créez en un : <span @click="goSignUp()">Inscription</span></p>
   </div>
 </template>
 
@@ -44,8 +47,8 @@ export default {
         return false;
       }
     }, 
-        goSignUp : function() {
-          this.$router.push("/signup");
+    goSignUp : function() {
+      this.$router.push("/signup");
     }, 
     login : function() {
       axios
@@ -90,5 +93,16 @@ export default {
   }
   .info {
     margin-top: 2rem;
+  }
+  .logo { 
+    height: 15vh;
+    width: 15vw;
+    margin: 0 auto;
+    & img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 2rem;
+  }
   }
 </style>
