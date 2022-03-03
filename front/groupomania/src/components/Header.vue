@@ -6,14 +6,14 @@
     <nav>
       <ul>
         <div class="nav__bar">
-          <li v-if="this.login == true"><router-link to="/"><fa icon="house" /> Home</router-link></li>
-          <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board"><fa icon="shield" /> ModoBoard</router-link></li>
-          <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board"><fa icon="user-shield" /> AdminBoard</router-link></li>
+          <li v-if="this.login == true"><router-link to="/"><fa icon="house" /><span> Home</span></router-link></li>
+          <li v-if="this.login == true && checkRole() == 1"><router-link to="/moderator-board"><fa icon="shield" /><span> ModoBoard</span></router-link></li>
+          <li v-if="this.login == true && checkRole() == 2"><router-link to="/admin-board"><fa icon="user-shield" /><span> AdminBoard</span></router-link></li>
         </div>
         <div class="connexion__bar">
           <li v-if="this.login == false"><router-link to="/signup">Inscription</router-link></li>
           <li v-if="this.login == false"><router-link to="/login">Connexion</router-link></li>
-          <li v-if="this.login == true"><router-link to="/profil"><fa icon="user" /> Profil</router-link></li>
+          <li v-if="this.login == true"><router-link to="/profil"><fa icon="user" /><span> Profil</span></router-link></li>
           <li v-if="this.login == true"><button type="button" class="powerBtn" @click="logout()"><fa icon="power-off" class="powerBtn__icon" /></button></li>
         </div>
       </ul>
@@ -109,5 +109,19 @@ a:hover {
 }
 img {
   height: 2.5rem;
+}
+@media screen and (max-width: 991px) {
+  nav {
+    & ul {
+    justify-content: center
+    }
+    & span {
+    display: none;
+  }
+  }
+  header {
+    flex-direction: column;
+    padding: 1rem;
+  }
 }
 </style>

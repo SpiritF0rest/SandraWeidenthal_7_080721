@@ -206,4 +206,13 @@ export default {
       }
     }
   }
+  @media screen and (max-width: 576px) {
+    .signUpForm__input {
+      padding: 0 0.5rem;
+    }
+    .signInUp__container {
+      height: 98vh;
+      margin: 1vh auto;
+    }
+  }
 </style>

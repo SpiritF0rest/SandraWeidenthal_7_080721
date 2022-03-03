@@ -626,4 +626,16 @@ export default {
   .post__image {
     height: 15rem;
   }
+@media screen and (min-width: 768px) and (max-width: 1199px) {
+  .createPost, .post {
+    margin : 0 2vw 2vw 2vw;
+    width: 96vw;
+  }
+}
+@media screen and (max-width: 767px) {
+  .createPost, .post {
+    width: 100vw;
+    border-radius: 0;
+  }
+}
 </style>

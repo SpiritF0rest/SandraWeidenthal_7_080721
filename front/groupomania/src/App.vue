@@ -78,4 +78,28 @@ body{
     justify-content: space-evenly;
     border-radius: 1rem 1rem;
   }
+  @media screen and (min-width: 1200px) and (max-width: 1400px) {
+    .signInUp__container {
+      width: 45vw;
+    }
+  }
+  @media screen and (min-width: 992px) and (max-width: 1199px) {
+    .signInUp__container {
+      width: 55vw;
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 991px) {
+    .signInUp__container {
+      width: 80vw;
+    }
+    .logo {
+      width: 25vw;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .signInUp__container {
+      width: 100%;
+      border-radius: 0;
+    }
+  }
 </style>

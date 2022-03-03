@@ -191,6 +191,11 @@ export default {
                 outline: 2px solid #dd7d83;
             }
     }
-    
+    @media screen and (max-width: 767px) {
+        .user {
+           width: 100%; 
+           border-radius: 0;
+        }
+    }
 
 </style>

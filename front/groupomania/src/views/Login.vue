@@ -96,7 +96,6 @@ export default {
   }
   .logo { 
     height: 15vh;
-    width: 15vw;
     margin: 0 auto;
     & img{
       width: 100%;
@@ -104,5 +103,8 @@ export default {
       object-fit: cover;
       border-radius: 2rem;
   }
+  }
+  @media screen and (min-width: 576) and (max-width: 767px) {
+
   }
 </style>

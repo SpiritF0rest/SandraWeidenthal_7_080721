@@ -243,7 +243,6 @@ export default {
         align-items: center;
         width: 50%;
         margin: 0 auto 1rem auto;
-        margin-bottom: 1rem;
             &__data {
                 display: flex;
                 flex-direction: column;
@@ -269,5 +268,22 @@ export default {
             &:focus-visible {
                 outline: 2px solid #dd7d83;
             }
+    }
+    @media screen and (min-width: 768px) and (max-width: 991px) {
+        .user {
+            width: 70%;
+        }
+    }
+    @media screen and (max-width: 767px) {
+        .user {
+            width: 100%;
+            border-radius: 0;
+            &__data {
+            padding-left: 1rem;    
+            }
+        }
+        .button {
+            margin: 0.5rem 1rem;
+        }
     }
 </style>

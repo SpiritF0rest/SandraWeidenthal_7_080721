@@ -344,8 +344,7 @@ h1 {
   justify-content: space-between;
   width: 50%;
   margin: 0 auto 1rem auto;
-  padding: 1.5rem 2rem;
-  margin-bottom: 1rem;               
+  padding: 1.5rem 2rem;              
   & li {
     display: flex;
     width: 100%;
@@ -357,4 +356,33 @@ h1 {
     padding: 0.5rem 0.5rem 0.5rem 0;
   }
 } 
+@media screen and (min-width: 768px) and (max-width: 1199px) {
+  .user {
+    width: 80%;
+  }
+  .editProfil form {
+    width: 80%;
+  }
+}
+@media screen and (max-width: 767px) {
+  .user {
+    width: 80%;
+  }
+  .profil {
+    width: 70vw;
+    margin: 0 2rem;
+  }
+  .body #container {
+    justify-content: center
+  }
+  .editProfil form {
+    width: 100%;
+  }
+  .signUpForm {
+  width: 100%;
+  &__input {
+    border-radius: 0;
+  }
+  }
+}
 </style>
