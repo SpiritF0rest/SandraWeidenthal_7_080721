@@ -28,11 +28,11 @@ pvSchema
 exports.signup = (req, res, next) => {
   // Checks the validity of the data entered during the connection.
   const schema = Joi.object().keys({
-    pseudo: Joi.string().min(3).required(),
+    pseudo: Joi.string().min(2).required(),
     email: Joi.string()
       .regex(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/)
       .required(),
-    password: Joi.string().min(3).required(),
+    password: Joi.string().min(8).required(),
     roles: Joi.array().items(
       Joi.string().valid(
         process.env.MULTIPASS_MODERATOR,
@@ -127,8 +127,8 @@ exports.login = (req, res, next) => {
 exports.getAllUsers = (req, res, next) => {
   if (req.authRole == "ROLE_MODERATOR" || req.authRole == "ROLE_ADMIN") {
     User.findAll({ include: Role })
-      .then((users) => res.status(200).json(users))
-      .catch((error) => res.status(400).json({ error }));
+        .then((users) => res.status(200).json(users))
+        .catch((error) => res.status(400).json({ error }));
   }
 };
 
@@ -143,7 +143,6 @@ exports.getOneUser = (req, res, next) => {
 };
 
 exports.modifyUser = (req, res, next) => {
-  console.log(req.body);
   User.findOne({
     where: {
       id: req.body.id,
@@ -273,8 +272,8 @@ exports.deleteUser = (req, res, next) => {
         req.authRole == "ROLE_ADMIN"
       ) {
         User.destroy({ where: { id: req.params.id } })
-          .then(() => res.status(200).json({ message: "User deleted." }))
-          .catch((error) => res.status(400).json({ error }));
+            .then(() => res.status(200).json({ message: "User deleted." }))
+            .catch((error) => res.status(400).json({ error }));
       } else {
         return res.status(400).json({ error: "Unauthorized request" });
       }

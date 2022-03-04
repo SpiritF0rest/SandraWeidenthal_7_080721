@@ -1,6 +1,6 @@
-const db = require("../models");
-const MultipassWords = db.MultipassWords;
-const User = db.user;
+const db                = require("../models");
+const MultipassWords    = db.MultipassWords;
+const User              = db.user;
 
 checkUserExisted = (req, res, next) => {
     // Check Username already exist

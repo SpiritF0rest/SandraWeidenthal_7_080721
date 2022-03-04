@@ -45,8 +45,9 @@ function initial() {
     }});
 };
 
+// Database synchronization
 db.sequelize
-    .sync() // { force: true } 
+    .sync() 
     .then(() => {
     console.log("Sync to db successful");
     initial();

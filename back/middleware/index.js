@@ -1,7 +1,7 @@
-const { config } = require("dotenv");
-const authJwt = require("./authJwt");
-const verifySignUp = require("./verifySignUp");
-const multerConfig = require("./multerConfig");
+const { config }    = require("dotenv");
+const authJwt       = require("./authJwt");
+const verifySignUp  = require("./verifySignUp");
+const multerConfig  = require("./multerConfig");
 
 module.exports = {
     authJwt,
