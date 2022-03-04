@@ -52,6 +52,7 @@ $ mysql -u root -p groupomania < groupomania.sql
 from cloned folder :
 $ cd ./backend
 $ mkdir images
+$ touch .env
 $ npm install
 ```
 
@@ -68,6 +69,7 @@ $ nodemon server
 ```
 from cloned folder :
 $ cd ./front/groupomania
+$ touch .env
 $ npm install
 ```
 
