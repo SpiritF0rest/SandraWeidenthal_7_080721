@@ -424,8 +424,7 @@ export default {
       margin-right: 0.5rem;
     }
     &__content {
-      padding-left: 0.5rem;
-      width: 100%;
+      padding: 0 0.5rem;
     }
     &__text {
       text-align: start;
@@ -614,6 +613,8 @@ export default {
   }
   .post__image {
     height: 15rem;
+    object-fit: contain;
+    width: 100%;
   }
   @media screen and (min-width: 768px) and (max-width: 1199px) {
     .createPost, .post {

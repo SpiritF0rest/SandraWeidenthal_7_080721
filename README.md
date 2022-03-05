@@ -43,7 +43,14 @@ Clone repository from : https://github.com/SpiritF0rest/SandraWeidenthal_7_08072
 #### :wrench: DataBase Install :wrench:
 
 ```
+First in MySQL :
+mysql> CREATE DATABASE groupomania;
+
+Next in terminal:
 $ mysql -u root -p groupomania < groupomania.sql
+
+You can now use groupomania DB with MySQL: 
+mysql> USE groupomania;
 ```
 
 #### :wrench: Backend Install :wrench:
