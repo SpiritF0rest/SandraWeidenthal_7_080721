@@ -35,7 +35,7 @@
         </div>
         <div class="post__buttons"> 
           <button type="button" class="forumButton" v-if="checkUser(post.authorId)" @click="editPost(post.id)"><fa icon="pencil" /> Modifier</button> 
-          <button type="button" class="forumButton forumButton--red" v-if="checkUserAndModerator(post.authorId) && checkAdmin(post.author)" @click="deletePost(post.id)"><fa icon="trash-can" /> Supprimer</button> 
+          <button type="button" class="forumButton forumButton--red" v-if="checkUserPower(post.authorId, post.author)" @click="deletePost(post.id)"><fa icon="trash-can" /> Supprimer</button> 
         </div>
         <div v-if="editClick == 1 && post.id == postId" class="postEdit">
           <form class="postEdit__form">
@@ -72,7 +72,7 @@
             </div>
             <div class="comment__buttons"> 
               <button type="button" class="forumButton" v-if="checkUser(comment.authorId)" @click="editComment(comment.id)"><fa icon="pencil" /></button> 
-              <button type="button" class="forumButton forumButton--red" v-if="checkUserAndModerator(comment.authorId) && checkAdmin(comment.author)" @click="deleteComment(comment.id)"><fa icon="trash-can" /></button>
+              <button type="button" class="forumButton forumButton--red" v-if="checkUserPower(comment.authorId, comment.author)" @click="deleteComment(comment.id)"><fa icon="trash-can" /></button>
             </div>    
           </div>
           <div v-if="commentClick == 1 && comment.id == commentId" class="commentEdit">
@@ -164,27 +164,42 @@ export default {
         }
       }
     },
-    checkUser(author) {
-      if (author == this.userData.data.id) {
+    checkUser(authorId) {
+      if (authorId == this.userData.data.id) {
         return true;
       } else {
         return false;
       }
     },
-    checkUserAndModerator(author) {
-      if(this.userData.data.roles[1] || author == this.userData.data.id) {
+    checkUserPower(authorId, author) {
+      if(author == "Admin") {
+        if(authorId == this.userData.data.id) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        if(authorId == this.userData.data.id || this.userData.data.roles[1]) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    /*checkModerator() {
+      if(this.userData.data.roles[1]) {
         return true;
       } else {
         return false;
       }
     },
     checkAdmin(author) {
-      if(author == this.userData.data.pseudo) {
+      if(author == "Admin" && author == this.userData.data.pseudo) {
         return true;
-      } else if (author == "Admin") {
+      } else {
         return false;
       }
-    },
+    },*/
     checkFormData(data) {
       if(!data && !this.postImage){
         return false;
