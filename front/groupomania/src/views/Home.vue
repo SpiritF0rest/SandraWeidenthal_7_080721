@@ -186,20 +186,6 @@ export default {
         }
       }
     },
-    /*checkModerator() {
-      if(this.userData.data.roles[1]) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    checkAdmin(author) {
-      if(author == "Admin" && author == this.userData.data.pseudo) {
-        return true;
-      } else {
-        return false;
-      }
-    },*/
     checkFormData(data) {
       if(!data && !this.postImage){
         return false;
